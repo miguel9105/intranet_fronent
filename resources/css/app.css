@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+/* resources/css/app.css */
+
+/* ... tus directivas @tailwind base, @tailwind components, @tailwind utilities ... */
+
+/* Animación de Pulso Lento (ya incluida en el anterior) */
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+.animate-pulse-slow {
+  animation: pulse-slow 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Animación de Fade-in y Desplazamiento hacia Arriba */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-in-up {
+  animation: fade-in-up 0.8s ease-out forwards;
+}
+
+/* Animación de Fade-in y Zoom ligero */
+@keyframes fade-in-zoom {
+  from {
+    opacity: 0;
+    transform: scale(1.05); /* Ligeramente más grande al inicio */
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.animate-fade-in-zoom {
+  animation: fade-in-zoom 1.5s ease-out forwards;
+}
+
+/* Clases de Retraso de Animación */
+/* Esto permite que puedas usar animate-delay-100, animate-delay-200, etc. */
+.animate-delay-100 { animation-delay: 0.1s; }
+.animate-delay-200 { animation-delay: 0.2s; }
+.animate-delay-300 { animation-delay: 0.3s; }
+.animate-delay-400 { animation-delay: 0.4s; }
+.animate-delay-500 { animation-delay: 0.5s; }
+/* Puedes añadir más si necesitas más retrasos */
