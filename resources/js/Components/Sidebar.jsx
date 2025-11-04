@@ -1,81 +1,54 @@
 // resources/js/Components/Sidebar.jsx
-import React, { useState } from 'react';
 import { Link } from '@inertiajs/react';
+import React from 'react';
+import { ArchiveBoxIcon, LifebuoyIcon, DocumentTextIcon, ArrowLeftEndOnRectangleIcon, ChevronDoubleLeftIcon, HomeIcon } from '@heroicons/react/24/outline'; // Iconos llamativos
 
-export default function Sidebar({ user, functions }) {
-    const [isOpen, setIsOpen] = useState(true); // Controla si el sidebar está abierto/cerrado
-
-    const toggleSidebar = () => {
-        setIsOpen(!isOpen);
-    };
+const NavItem = ({ href, active, children, icon: Icon }) => {
+    const isActive = active || route().current(href);
+    const baseClasses = "flex items-center p-3 my-2 transition-colors duration-200 rounded-lg hover:bg-indigo-600 group";
+    const activeClasses = isActive ? "bg-indigo-600 shadow-md transform scale-[1.02]" : "hover:shadow-md";
 
     return (
-        <aside 
-            className={`bg-red-700 text-white transition-all duration-300 ${isOpen ? 'w-64' : 'w-20'} 
-            flex flex-col border-r border-red-800 shadow-xl relative z-40`}
+        <Link 
+            href={route(href)} 
+            className={`${baseClasses} ${activeClasses} ${isActive ? 'text-white' : 'text-indigo-200'}`}
         >
-            {/* Botón para Abrir/Cerrar Sidebar */}
-            <button 
-                onClick={toggleSidebar}
-                className="absolute top-4 right-[-1.5rem] bg-red-700 text-white rounded-full p-2 shadow-md z-50 transition-transform duration-300 hover:scale-110"
-                aria-label={isOpen ? "Cerrar menú lateral" : "Abrir menú lateral"}
-            >
-                {isOpen ? '◀' : '▶'} {/* Icono simple para el toggle */}
-            </button>
+            <Icon className={`w-6 h-6 mr-3 ${isActive ? 'text-white' : 'text-indigo-300 group-hover:text-white'}`} />
+            <span className="font-semibold text-sm">{children}</span>
+        </Link>
+    );
+};
 
-            {/* Logo o Título de la Aplicación */}
-            <div className={`p-4 ${isOpen ? 'text-left' : 'text-center'} border-b border-red-800`}>
-                <Link href={route('dashboard')}>
-                    <span className={`font-extrabold text-2xl transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 absolute left-[-9999px]'}`}>
-                        ElectroCréditos
-                    </span>
-                    <span className={`font-extrabold text-2xl transition-opacity duration-300 ${isOpen ? 'opacity-0 absolute left-[-9999px]' : 'opacity-100'}`}>
-                        EC
-                    </span>
-                </Link>
+export default function Sidebar({ primaryColor }) {
+    return (
+        <div className={`flex flex-col h-full p-4 ${primaryColor}`}>
+            {/* Logo o Título */}
+            <div className="text-2xl font-bold text-white mb-8 border-b border-indigo-500/50 pb-4">
+                <span className="block transition-transform duration-300 hover:scale-[1.05]">
+                    **🚀 App Empresarial**
+                </span>
             </div>
 
-            {/* Nombre de Usuario (Solo visible si el sidebar está abierto) */}
-            {user && (
-                <div className={`p-4 text-center ${isOpen ? 'opacity-100 h-auto' : 'opacity-0 h-0 overflow-hidden'} transition-all duration-300 ease-in-out`}>
-                    <p className="font-semibold text-lg">{user.name}</p>
-                    <small className="text-gray-300">{user.role || 'Rol no definido'}</small>
-                </div>
-            )}
-
-            {/* Lista de Funciones / Navegación */}
-            <nav className="flex-1 mt-4">
-                <ul>
-                    {functions.map((func) => (
-                        <li key={func.id}>
-                            <Link
-                                href={func.href}
-                                method={func.method || 'get'} // Para el botón de Logout
-                                as="button" // Renderiza como botón para método POST
-                                className={`flex items-center p-4 w-full text-left 
-                                    hover:bg-red-600 transition duration-150 ease-in-out 
-                                    ${route().current(func.id) ? 'bg-red-800 border-l-4 border-red-300' : ''}
-                                    ${isOpen ? '' : 'justify-center'}`}
-                            >
-                                <span className="text-xl mr-3">{func.icon}</span> {/* Icono */}
-                                <span className={`transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 absolute left-[-9999px]'}`}>
-                                    {func.name}
-                                </span>
-                            </Link>
-                        </li>
-                    ))}
-                </ul>
+            {/* Opciones de Navegación */}
+            <nav className="flex-1 space-y-2">
+                <NavItem href="dashboard" icon={HomeIcon}>Dashboard</NavItem>
+                <NavItem href="inventario" icon={ArchiveBoxIcon}>Inventario</NavItem>
+                <NavItem href="mesa-de-ayuda" icon={LifebuoyIcon}>Mesa de Ayuda</NavItem>
+                <NavItem href="documentos" icon={DocumentTextIcon}>Documentos</NavItem>
             </nav>
 
-            {/* Configuración inferior (opcional, como el icono de engranaje) */}
-            <div className={`p-4 border-t border-red-800 ${isOpen ? 'text-left' : 'text-center'}`}>
-                <Link href="#" className="flex items-center text-gray-300 hover:text-white transition">
-                    <span className="text-xl mr-3">⚙</span>
-                    <span className={`transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 absolute left-[-9999px]'}`}>
-                        Configuración
-                    </span>
+            {/* Cerrar Sesión (al final) */}
+            <div className="mt-auto pt-4 border-t border-indigo-500/50">
+                <Link
+                    href={route('logout')}
+                    method="post"
+                    as="button"
+                    className="w-full flex items-center p-3 text-red-300 transition-colors duration-200 rounded-lg hover:bg-red-700 hover:text-white group"
+                >
+                    <ArrowLeftEndOnRectangleIcon className="w-6 h-6 mr-3 text-red-300 group-hover:text-white" />
+                    <span className="font-semibold text-sm">Cerrar Sesión</span>
                 </Link>
             </div>
-        </aside>
+        </div>
     );
 }

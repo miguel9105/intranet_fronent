@@ -1,125 +1,119 @@
-import { useState } from 'react';
-import ApplicationLogo from '@/Components/ApplicationLogo';
-import Dropdown from '@/Components/Dropdown';
-import NavLink from '@/Components/NavLink';
-import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
-import { Link } from '@inertiajs/react';
+// resources/js/Layouts/AuthenticatedLayout.jsx
+import React from 'react';
+import { Link, Head } from '@inertiajs/react';
+import axios from 'axios'; 
+import { HomeIcon, ArchiveBoxIcon, LifebuoyIcon, DocumentIcon, CogIcon, ArrowLeftStartOnRectangleIcon } from '@heroicons/react/24/outline'; // Iconos
 
-export default function Authenticated({ user, header, children }) {
-    const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
+// Componente de Enlace de Navegación
+const NavLink = ({ href, active, children, icon: Icon }) => {
+    const baseClasses = "flex items-center p-3 rounded-xl transition duration-150 ease-in-out";
+    const activeClasses = "bg-red-600 text-white shadow-md font-semibold";
+    const inactiveClasses = "text-gray-600 hover:bg-red-50 hover:text-red-600 font-medium";
 
     return (
-        <div className="min-h-screen bg-gray-100">
-            <nav className="bg-white border-b border-gray-100">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between h-16">
-                        <div className="flex">
-                            <div className="shrink-0 flex items-center">
-                                <Link href="/">
-                                    <ApplicationLogo className="block h-9 w-auto fill-current text-gray-800" />
-                                </Link>
-                            </div>
+        <Link
+            href={href}
+            className={`${baseClasses} ${active ? activeClasses : inactiveClasses}`}
+        >
+            {Icon && <Icon className="w-5 h-5 mr-3" />}
+            {children}
+        </Link>
+    );
+};
 
-                            <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                <NavLink href={route('dashboard')} active={route().current('dashboard')}>
-                                    Dashboard
-                                </NavLink>
-                            </div>
-                        </div>
+// Componente Principal del Layout
+export default function Authenticated({ auth, header, children }) {
+    
+    // Función para manejar el cierre de sesión: Elimina el token y redirige.
+    const handleLogout = (e) => {
+        e.preventDefault();
+        
+        // 1. Opcional: Llamar a la API de Laravel para revocar el token 
+        // axios.post(route('api.logout_token_revocation')); 
 
-                        <div className="hidden sm:flex sm:items-center sm:ms-6">
-                            <div className="ms-3 relative">
-                                <Dropdown>
-                                    <Dropdown.Trigger>
-                                        <span className="inline-flex rounded-md">
-                                            <button
-                                                type="button"
-                                                className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150"
-                                            >
-                                                {user.name}
+        // 2. Eliminar el token de localStorage
+        localStorage.removeItem('auth_token');
+        
+        // 3. Eliminar el header de Axios
+        delete axios.defaults.headers.common['Authorization'];
 
-                                                <svg
-                                                    className="ms-2 -me-0.5 h-4 w-4"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    viewBox="0 0 20 20"
-                                                    fill="currentColor"
-                                                >
-                                                    <path
-                                                        fillRule="evenodd"
-                                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                                        clipRule="evenodd"
-                                                    />
-                                                </svg>
-                                            </button>
-                                        </span>
-                                    </Dropdown.Trigger>
+        // 4. Redirigir al login (Inertia cargará la página pública)
+        window.location.href = route('login'); 
+    };
 
-                                    <Dropdown.Content>
-                                        <Dropdown.Link href={route('profile.edit')}>Profile</Dropdown.Link>
-                                        <Dropdown.Link href={route('logout')} method="post" as="button">
-                                            Log Out
-                                        </Dropdown.Link>
-                                    </Dropdown.Content>
-                                </Dropdown>
-                            </div>
-                        </div>
+    const user = auth.user;
 
-                        <div className="-me-2 flex items-center sm:hidden">
-                            <button
-                                onClick={() => setShowingNavigationDropdown((previousState) => !previousState)}
-                                className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out"
-                            >
-                                <svg className="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                                    <path
-                                        className={!showingNavigationDropdown ? 'inline-flex' : 'hidden'}
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M4 6h16M4 12h16M4 18h16"
-                                    />
-                                    <path
-                                        className={showingNavigationDropdown ? 'inline-flex' : 'hidden'}
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M6 18L18 6M6 6l12 12"
-                                    />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
+    const navigation = [
+        { name: 'Dashboard', href: route('dashboard'), icon: HomeIcon, active: route().current('dashboard') },
+        { name: 'Inventario', href: route('inventario'), icon: ArchiveBoxIcon, active: route().current('inventario') }, 
+        { name: 'Mesa de Ayuda', href: route('mesa-de-ayuda'), icon: LifebuoyIcon, active: route().current('mesa-de-ayuda') }, 
+        { name: 'Documentos', href: route('documentos'), icon: DocumentIcon, active: route().current('documentos') },
+        { name: 'Configuración', href: '#', icon: CogIcon, active: false }, 
+    ];
+
+    return (
+        <div className="min-h-screen bg-gray-100 flex">
+            
+            {/* Sidebar */}
+            <aside className="w-64 bg-white shadow-xl flex flex-col p-6 sticky top-0 h-screen">
+                <div className="flex-shrink-0 flex items-center mb-10 border-b pb-4">
+                    <div className="w-8 h-8 rounded-md bg-red-600 mr-3"></div>
+                    <span className="ml-0 text-xl font-bold text-gray-800">Intranet App</span>
                 </div>
 
-                <div className={(showingNavigationDropdown ? 'block' : 'hidden') + ' sm:hidden'}>
-                    <div className="pt-2 pb-3 space-y-1">
-                        <ResponsiveNavLink href={route('dashboard')} active={route().current('dashboard')}>
-                            Dashboard
-                        </ResponsiveNavLink>
-                    </div>
+                {/* Navegación Principal */}
+                <nav className="flex-grow space-y-2">
+                    {navigation.map((item) => (
+                        <NavLink key={item.name} href={item.href} active={item.active} icon={item.icon}>
+                            {item.name}
+                        </NavLink>
+                    ))}
+                </nav>
 
-                    <div className="pt-4 pb-1 border-t border-gray-200">
-                        <div className="px-4">
-                            <div className="font-medium text-base text-gray-800">{user.name}</div>
-                            <div className="font-medium text-sm text-gray-500">{user.email}</div>
+                {/* Sección de Usuario y Logout */}
+                <div className="pt-4 mt-auto border-t">
+                    <div className="flex items-center p-3">
+                        <div className="flex-shrink-0">
+                            <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-600 font-bold">
+                                {/* Muestra la primera letra del nombre */}
+                                {user.name ? user.name.substring(0, 1) : 'U'}
+                            </div>
                         </div>
-
-                        <div className="mt-3 space-y-1">
-                            <ResponsiveNavLink href={route('profile.edit')}>Profile</ResponsiveNavLink>
-                            <ResponsiveNavLink method="post" href={route('logout')} as="button">
-                                Log Out
-                            </ResponsiveNavLink>
+                        <div className="ml-3 truncate">
+                            <p className="text-sm font-semibold text-gray-800 truncate">{user.name}</p>
+                            <p className="text-xs text-gray-500 truncate">{user.email}</p>
                         </div>
                     </div>
+                    
+                    {/* Botón de Logout */}
+                    <button
+                        onClick={handleLogout}
+                        className="w-full flex items-center justify-center p-3 mt-2 text-sm font-medium text-gray-600 rounded-xl hover:bg-gray-200 transition duration-150"
+                    >
+                        <ArrowLeftStartOnRectangleIcon className="w-5 h-5 mr-3" />
+                        Cerrar Sesión
+                    </button>
                 </div>
-            </nav>
+            </aside>
 
-            {header && (
-                <header className="bg-white shadow">
-                    <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">{header}</div>
-                </header>
-            )}
+            {/* Contenido Principal */}
+            <main className="flex-1 flex flex-col overflow-auto">
+                {/* Header */}
+                {header && (
+                    <header className="bg-white shadow-sm sticky top-0 z-10">
+                        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                            <h2 className="font-semibold text-2xl text-gray-800 leading-tight">
+                                {header}
+                            </h2>
+                        </div>
+                    </header>
+                )}
 
-            <main>{children}</main>
+                {/* Contenido de la Página */}
+                <div className="py-12 px-4 sm:px-6 lg:px-8">
+                    {children}
+                </div>
+            </main>
         </div>
     );
 }

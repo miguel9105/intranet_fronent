@@ -10,4 +10,9 @@ export default defineConfig({
         }),
         react(),
     ],
+    server: {
+        // Establece el puerto deseado (ej. 5173 es el predeterminado de Vite, pero puedes usar 3000)
+        port: 3000, 
+       
+    }
 });

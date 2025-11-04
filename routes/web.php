@@ -4,24 +4,23 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use Illuminate\Http\Request; // ⚠️ IMPORTANTE: Necesitas importar Request
 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
 */
 
+// Rutas Públicas
+Route::get('login', function () {
+    return Inertia::render('Login'); 
+})->name('login'); 
+
 Route::get('/', function () {
-    // Retorna la página Home.jsx.
-    // Los datos que le pases aquí estarán disponibles en las 'props' de React.
     return Inertia::render('Home', [
-        'canLogin' => Route::has('login'), // Si usas Laravel Breeze
-        'canRegister' => Route::has('register'), // Si usas Laravel Breeze
+        'canLogin' => Route::has('login'), 
+        'canRegister' => Route::has('register'), 
     ]);
 })->name('home');
 
@@ -29,27 +28,44 @@ Route::get('/contacto', function () {
     return Inertia::render('Contact');
 })->name('contact');
 
+// =========================================================================
+// ✅ RUTAS PROTEGIDAS POR EL MIDDLEWARE 'auth.token'
+// =========================================================================
 
-// Rutas de autenticación (si usaste php artisan breeze:install)
+Route::middleware(['auth.token'])->group(function () {
+    
+    // Función de ayuda para pasar los props de autenticación (auth) a Inertia
+    $authProps = function (Request $request) {
+        return [
+            'auth' => [
+                // Solo pasa los datos del usuario necesarios
+                'user' => $request->user() ? $request->user()->only('id', 'name', 'email') : ['name' => 'invitado', 'email' => ''],
+            ],
+        ];
+    };
+    
+    // ➡️ RUTA DEL DASHBOARD (AHORA PROTEGIDA CON TOKEN)
+    Route::get('/dashboard', function (Request $request) use ($authProps) {
+        return Inertia::render('Dashboard', $authProps($request)); // ⬅️ 
+    })->name('dashboard');
+
+    // Inventario
+    Route::get('/inventario', function (Request $request) use ($authProps) {
+        return Inertia::render('Inventario/Index', $authProps($request)); // ⬅️ Pasa la data aquí
+    })->name('inventario');
+
+    // Mesa de Ayuda
+    Route::get('/mesa-de-ayuda', function (Request $request) use ($authProps) {
+        return Inertia::render('MesaDeAyuda/Index', $authProps($request)); // ⬅️ Pasa la data aquí
+    })->name('mesa-de-ayuda');
+
+    // Documentos
+    Route::get('/documentos', function (Request $request) use ($authProps) {
+        return Inertia::render('Documentos/Index', $authProps($request)); // ⬅️ Pasa la data aquí
+    })->name('documentos');
+    
+});
+// =========================================================================
+
+// Incluye las rutas de logout 
 require __DIR__.'/auth.php';
-
-// Route::get('/', function () {
-//     return Inertia::render('Welcome', [
-//         'canLogin' => Route::has('login'),
-//         'canRegister' => Route::has('register'),
-//         'laravelVersion' => Application::VERSION,
-//         'phpVersion' => PHP_VERSION,
-//     ]);
-// });
-
-// Route::get('/dashboard', function () {
-//     return Inertia::render('Dashboard');
-// })->middleware(['auth', 'verified'])->name('dashboard');
-
-// Route::middleware('auth')->group(function () {
-//     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-//     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-//     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-// });
-
-// require __DIR__.'/auth.php';

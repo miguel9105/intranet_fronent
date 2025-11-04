@@ -18,6 +18,8 @@ return [
         'passwords' => 'users',
     ],
 
+
+
     /*
     |--------------------------------------------------------------------------
     | Authentication Guards
@@ -38,6 +40,11 @@ return [
     'guards' => [
         'web' => [
             'driver' => 'session',
+            'provider' => 'users',
+        ],
+        // ➡️ CORRECCIÓN: El guard 'api' debe estar DENTRO de 'guards'
+        'api' => [ 
+            'driver' => 'sanctum', // Usar 'sanctum' o 'token'
             'provider' => 'users',
         ],
     ],
