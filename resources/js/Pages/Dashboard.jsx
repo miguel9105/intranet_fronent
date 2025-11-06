@@ -21,7 +21,7 @@ const StatCard = ({ title, value, icon: Icon, colorClass }) => (
 );
 
 // Página Principal del Dashboard
-export default function DashboardIndex({ auth }) {
+export default function Dashboard({ auth }) {
     // Los datos del usuario vienen del prop 'auth'
     const userName = auth.user.name.split(' ')[0];
     
