@@ -45,6 +45,7 @@ export default function Authenticated({ auth, header, children }) {
 
     const navigation = [
         { name: 'Dashboard', href: route('dashboard'), icon: HomeIcon, active: route().current('dashboard') },
+        // ✅ Rutas nuevas integradas correctamente
         { name: 'Inventario', href: route('inventario'), icon: ArchiveBoxIcon, active: route().current('inventario') }, 
         { name: 'Mesa de Ayuda', href: route('mesa-de-ayuda'), icon: LifebuoyIcon, active: route().current('mesa-de-ayuda') }, 
         { name: 'Documentos', href: route('documentos'), icon: DocumentIcon, active: route().current('documentos') },

@@ -1,54 +1,26 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
-import React from 'react';
 
-export default function Inventario({ auth }) {
+export default function InventarioIndex({ auth }) {
+    // La prop 'auth' contiene la información del usuario logeado:
+    // auth.user.id, auth.user.name, auth.user.email
+    
     return (
-        <AuthenticatedLayout user={auth.user}>
+        <AuthenticatedLayout
+            user={auth.user} // Pasamos el usuario al Layout
+            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Módulo de Inventario 📦</h2>}
+        >
             <Head title="Inventario" />
 
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    <div className="bg-white overflow-hidden shadow-xl sm:rounded-lg p-8">
-                        
-                        <h2 className="text-4xl font-extrabold text-indigo-800 mb-6 border-b pb-4">
-                            📦 Gestión de Inventario
-                        </h2>
-                        
-                        <p className="text-gray-600 mb-8 text-lg">
-                            Aquí se encuentran los detalles del stock actual, la gestión de entradas y salidas, y el seguimiento de activos.
+                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+                        <h3 className="text-lg font-medium text-gray-900">Bienvenido al Inventario, {auth.user.name}.</h3>
+                        <p className="mt-1 text-sm text-gray-600">
+                            Aquí podrás gestionar el stock, agregar nuevos productos y ver el historial de movimientos.
                         </p>
                         
-                        {/* Contenido Simulado de la Tabla de Inventario */}
-                        <div className="p-6 bg-indigo-50 rounded-lg shadow-inner">
-                            <h3 className="text-xl font-semibold text-indigo-700 mb-4">Tabla de Activos (Ejemplo)</h3>
-                            <table className="min-w-full divide-y divide-indigo-200">
-                                <thead className="bg-indigo-100">
-                                    <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-indigo-600 uppercase tracking-wider">Producto</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-indigo-600 uppercase tracking-wider">Cantidad</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-indigo-600 uppercase tracking-wider">Estado</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="bg-white divide-y divide-gray-200">
-                                    <tr className="hover:bg-gray-50 transition duration-150">
-                                        <td className="px-6 py-4 whitespace-nowrap">Laptop Empresarial</td>
-                                        <td className="px-6 py-4 whitespace-nowrap">150</td>
-                                        <td className="px-6 py-4 whitespace-nowrap"><span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Disponible</span></td>
-                                    </tr>
-                                    <tr className="hover:bg-gray-50 transition duration-150">
-                                        <td className="px-6 py-4 whitespace-nowrap">Monitor 27"</td>
-                                        <td className="px-6 py-4 whitespace-nowrap">220</td>
-                                        <td className="px-6 py-4 whitespace-nowrap"><span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Bajo Stock</span></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            
-                            <button className="mt-6 px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition duration-300 transform hover:scale-[1.05]">
-                                + Agregar Nuevo Producto
-                            </button>
-                        </div>
-
+                        {/* Aquí iría el contenido específico del inventario: tablas, formularios, etc. */}
                     </div>
                 </div>
             </div>

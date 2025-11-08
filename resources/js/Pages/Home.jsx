@@ -3,7 +3,8 @@ import React from 'react';
 import GuestLayout from '@/Layouts/GuestLayout';
 import AreaCard from '@/Components/AreaCard';
 import EmpresaCard from '@/Components/EmpresaCard';
-import { FaChartLine, FaHandshake, FaMoneyBillWave, FaUsers, FaCalculator, FaBuilding } from 'react-icons/fa'; // Necesitas instalar react-icons (npm install react-icons)
+// Se agrega FaMapMarkerAlt para las ciudades
+import { FaChartLine, FaHandshake, FaMoneyBillWave, FaUsers, FaCalculator, FaBuilding, FaGlobe, FaBriefcase, FaCode, FaMapMarkerAlt } from 'react-icons/fa';
 
 // --- DATOS SIMULADOS ---
 const areas = [
@@ -18,78 +19,124 @@ const areas = [
 const empresas = [
     { 
         name: 'Finansueños', 
-        logoUrl: '/images/logos/finansueños.png', // <-- Ruta a tu logo
-        websiteUrl: 'https://www.finansueños.com', // <-- URL de destino
+        logoUrl: '/images/logos/finansueños.png', 
+        websiteUrl: 'https://www.finansueños.com', 
         description: 'Unimos la tecnología financiera y la experiencia humana para ofrecer soluciones ágiles de crédito.' 
     },
     { 
         name: 'ElectroCréditos del Cauca', 
-        logoUrl: '/images/logos/electrocreditos.jpg', // <-- Ruta a tu logo
-        websiteUrl: 'https://www.electrocreditoscauca.com', // <-- URL de destino
+        logoUrl: '/images/logos/electrocreditos.jpg', 
+        websiteUrl: 'https://www.electrocreditoscauca.com', 
         description: 'Entidad líder en la región, enfocada en microcréditos para emprendedores y pymes.' 
     },
-    // Añade más empresas aquí
+    // Se elimina Innovatech Solutions
+];
+
+// NUEVO: Ciudades en las que estamos activos
+const ciudadesActivas = [
+    'Popayán', 'Cali', 'Pasto', 'Neiva', 'Manizales', 'Pereira', 'Armenia', 'Bogotá'
+];
+
+const metricas = [
+    { value: '15+', label: 'Años de Experiencia', icon: <FaBriefcase className="text-4xl text-yellow-300 mb-3" /> },
+    { value: '250M', label: 'Créditos Aprobados (USD)', icon: <FaMoneyBillWave className="text-4xl text-yellow-300 mb-3" /> },
+    { value: '1.2K', label: 'Colaboradores Activos', icon: <FaUsers className="text-4xl text-yellow-300 mb-3" /> },
+    { value: '5', label: 'Empresas Aliadas', icon: <FaGlobe className="text-4xl text-yellow-300 mb-3" /> },
 ];
 // -----------------------
 
 export default function Home(props) {
-    return (
-        <GuestLayout>
-            {/* 1. SECCIÓN HERO / BANNER */}
-<section
-    className="relative bg-violet-900 text-white flex items-center justify-center p-20 min-h-[500px] overflow-hidden"
->
-    {/* Imagen de Fondo Estilizada (Placeholder) */}
-    {/* Animación: La imagen de fondo aparece con un ligero zoom */}
-    <div 
-        className="absolute inset-0 bg-cover bg-center opacity-30 animate-fade-in-zoom" 
-        style={{ backgroundImage: "url('/images/hero-bg.jpg')" }}
-    >
-        {/* Asegúrate de que '/images/hero-bg.jpg' exista en tu carpeta public/images */}
-    </div>
-    
-    {/* Contenido Centrado con animaciones de entrada individuales */}
-    <div className="relative z-10 text-center max-w-2xl">
-        {/* Título "Intranet" con animacion de entrada: Fade-in y desplazamiento hacia arriba */}
-        <h1 className="text-7xl font-extrabold leading-tight mb-6 
-                       text-yellow-300 drop-shadow-lg 
-                       animate-fade-in-up animate-delay-100"> 
-            INTRANET
-        </h1>
-        {/* Subtítulo (el que antes era h2, ahora lo hacemos más sutil o lo removemos si no encaja) */}
-        {/* Si quieres algo similar al "enternet" original, puedes ponerlo aquí con menos énfasis */}
-        <h2 className="text-2xl font-semibold uppercase tracking-widest text-pink-400 mb-2
-                       animate-fade-in-up animate-delay-200">
-            Tu portal de oportunidades
-        </h2>
-        
-        {/* Párrafo con animacion de entrada: Fade-in y un poco de retraso */}
-        <p className="text-lg mb-8 font-light opacity-80 max-w-xl mx-auto
-                      animate-fade-in-up animate-delay-300">
-            Descubre y potencia tu camino profesional. Conecta con el equipo y accede a recursos exclusivos.
-        </p>
-        
-        {/* Botón con animacion de entrada: Fade-in y un último retraso */}
-        <button 
-            className="bg-red-600 text-white py-3 px-12 text-xl font-bold rounded-full 
-                       shadow-xl hover:bg-red-700 transition duration-300 transform hover:scale-105 
-                       animate-fade-in-up animate-delay-400"
-        >
-            Explorar ahora
-        </button>
-    </div>
-</section>
+    // Si GuestLayout acepta un prop 'headerImage', lo pasaríamos así:
+    const HeaderImage = (
+        <img 
+            src="/images/header-logo.png" 
+            alt="Logo de la Intranet Principal" 
+            className="h-10 w-auto transition duration-300 hover:scale-110" 
+        />
+    );
 
-            {/* 2. SECCIÓN ÁREAS CLAVE */}
-            <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50">
+    return (
+        // Se simula la inclusión de una imagen en el Header, pasando un componente React
+        <GuestLayout headerImage={HeaderImage}>
+            
+            {/* 1. SECCIÓN HERO / BANNER (Efectos de Brillo y Animación de Entrada) */}
+            <section
+                className="relative bg-violet-900 text-white flex items-center justify-center p-20 min-h-[600px] overflow-hidden shadow-2xl"
+            >
+                {/* Fondo Estilizado: Degradado sutil y un 'brillo' tecnológico */}
+                <div 
+                    className="absolute inset-0 bg-cover bg-center opacity-40" 
+                    style={{ backgroundImage: "url('/images/hero-bg.jpg')" }}
+                >
+                    <div className="absolute inset-0 bg-gradient-to-t from-violet-900 via-transparent to-violet-900"></div>
+                </div>
+
+                {/* Contenido Centrado con animaciones de entrada individuales */}
+                <div className="relative z-10 text-center max-w-4xl">
+                    <h1 className="text-8xl font-black leading-tight mb-6 
+                                     text-yellow-300 drop-shadow-lg 
+                                     animate-fade-in-up animate-delay-100"> 
+                        PORTAL LABORAL
+                    </h1>
+                    <h2 className="text-3xl font-semibold uppercase tracking-widest text-pink-400 mb-4
+                                     animate-fade-in-up animate-delay-200">
+                        INTRANET CENTRALIZADA
+                    </h2>
+                    
+                    <p className="text-xl mb-10 font-light opacity-90 max-w-2xl mx-auto
+                                     animate-fade-in-up animate-delay-300">
+                        Descubre tu próximo paso. Conecta con el equipo, gestiona tus documentos y accede a la bolsa de empleo interna de todas nuestras asociadas.
+                    </p>
+                    
+                    {/* Botón Principal (Más grande y llamativo) */}
+                    <button 
+                        className="bg-red-600 text-white py-4 px-16 text-2xl font-bold rounded-full 
+                                     shadow-2xl hover:bg-red-700 transition duration-300 transform hover:scale-105 
+                                     ring-4 ring-red-400/50 hover:ring-red-400 
+                                     animate-fade-in-up animate-delay-400"
+                    >
+                        Acceso Rápido al Empleo
+                    </button>
+                </div>
+            </section>
+            
+            <hr className="border-gray-300" />
+            
+            {/* 4. SECCIÓN DE MÉTRICAS / ESTADÍSTICAS */}
+            <section className="py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
                 <div className="max-w-7xl mx-auto">
-                    <h2 className="text-3xl font-bold text-gray-800 text-center mb-12 border-b-2 border-red-300 inline-block pb-2">
-                        Áreas Clave de Oportunidad
+                    <h3 className="text-2xl font-bold text-gray-700 text-center mb-10">Nuestro Impacto en Cifras</h3>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                        {metricas.map((metric, index) => (
+                            <div 
+                                key={index} 
+                                className="p-6 bg-white rounded-xl shadow-lg border-t-4 border-violet-600 
+                                           transform hover:scale-105 transition duration-300"
+                            >
+                                {metric.icon}
+                                <p className="text-4xl font-extrabold text-violet-900 mb-1">{metric.value}</p>
+                                <p className="text-md font-medium text-gray-500">{metric.label}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+            
+            <hr className="border-gray-300" />
+            
+            {/* 2. SECCIÓN ÁREAS CLAVE */}
+            <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
+                <div className="max-w-7xl mx-auto">
+                    <h2 className="text-4xl font-bold text-gray-800 text-center mb-14">
+                        <span className="border-b-4 border-yellow-400 pb-1">Tu Carrera Comienza Aquí</span> 🚀
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {areas.map((area, index) => (
-                            // Animación al aparecer
-                            <div key={index} className="transition duration-500 ease-in-out transform hover:translate-y-[-5px] hover:shadow-2xl">
+                            <div 
+                                key={index} 
+                                // Animación: ligereo ascenso al pasar el mouse
+                                className="transition duration-500 ease-in-out transform hover:translate-y-[-5px] hover:shadow-2xl"
+                            >
                                 <AreaCard 
                                     title={area.title} 
                                     description={area.description} 
@@ -100,27 +147,70 @@ export default function Home(props) {
                     </div>
                 </div>
             </section>
-
-          {/* 3. SECCIÓN EMPRESAS ASOCIADAS */}
-        <section className="py-16 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-7xl mx-auto">
-                <h2 className="text-3xl font-bold text-gray-800 text-center mb-12 border-b-2 border-red-300 inline-block pb-2">
-                    Empresas Asociadas
-                </h2>
-                <div className="flex flex-wrap justify-center gap-6">
-                    {empresas.map((empresa, index) => (
-                        <div 
-                            key={index} 
-                            // Eliminamos el hover:shadow de aquí y lo ponemos en la tarjeta interna para mejor control de la animación
-                            className="w-full md:w-[48%]"
-                        >
-                            <EmpresaCard data={empresa} />
-                        </div>
-                    ))}
+            
+            {/* 5. SECCIÓN DE CULTURA/VALORES (Llamada a la Acción Secundaria) */}
+            <section className="bg-red-600 py-20 px-4 sm:px-6 lg:px-8">
+                <div className="max-w-4xl mx-auto text-center text-white">
+                    <FaCode className="text-6xl mx-auto mb-4 text-yellow-300" />
+                    <h2 className="text-4xl font-black mb-4">¡Tecnología y Talento de la Mano!</h2>
+                    <p className="text-xl font-light mb-8 opacity-90">
+                        Nuestras empresas apuestan por la **innovación**. Únete a un ambiente que fomenta el aprendizaje continuo, la colaboración ágil y el desarrollo de soluciones de vanguardia.
+                    </p>
+                    <a 
+                        href="/cultura" 
+                        className="bg-violet-900 text-white py-3 px-8 text-lg font-bold rounded-full 
+                                     shadow-lg hover:bg-violet-800 transition duration-300 transform hover:scale-105"
+                    >
+                        Conoce Nuestra Cultura
+                    </a>
                 </div>
-            </div>
-        </section>
+            </section>
 
+            {/* 3. SECCIÓN EMPRESAS ASOCIADAS y CIUDADES ACTIVAS */}
+            <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50">
+                <div className="max-w-7xl mx-auto">
+                    
+                    {/* Título de Empresas */}
+                    <h2 className="text-4xl font-bold text-gray-800 text-center mb-14">
+                        <span className="border-b-4 border-yellow-400 pb-1">Nuestra Red de Aliados</span> 🤝
+                    </h2>
+                    
+                    {/* Contenedor de Empresas: Se ajusta el grid para 2 elementos centrados */}
+                    <div className="flex flex-wrap justify-center gap-8 mb-16">
+                        {empresas.map((empresa, index) => (
+                            <div 
+                                key={index} 
+                                // Ajuste clave: Ocupa mitad en pantallas grandes y total en móvil, y se centra con justify-center del padre.
+                                className="w-full sm:w-[80%] lg:w-[45%] min-w-[300px] transition duration-500 ease-in-out transform hover:translate-y-[-5px]"
+                            >
+                                <EmpresaCard data={empresa} />
+                            </div>
+                        ))}
+                    </div>
+                    
+                    <hr className="border-red-300 my-10" />
+
+                    {/* NUEVO: SECCIÓN DE CIUDADES ACTIVAS */}
+                    <div className="text-center">
+                        <h3 className="text-3xl font-bold text-gray-800 mb-8 flex items-center justify-center">
+                            <FaMapMarkerAlt className="text-red-500 mr-3" />
+                            Ciudades donde estamos activos
+                        </h3>
+                        <div className="flex flex-wrap justify-center gap-4 max-w-4xl mx-auto">
+                            {ciudadesActivas.map((ciudad, index) => (
+                                <span 
+                                    key={index} 
+                                    className="bg-violet-100 text-violet-800 text-lg font-semibold px-4 py-2 rounded-full 
+                                               shadow-md hover:bg-violet-200 transition duration-200"
+                                >
+                                    {ciudad}
+                                </span>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
         </GuestLayout>
     );
 }

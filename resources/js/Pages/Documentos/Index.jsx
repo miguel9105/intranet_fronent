@@ -1,25 +1,25 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 
-export default function MesaDeAyudaIndex({ auth }) {
+export default function DocumentosIndex({ auth }) {
     // La prop 'auth' contiene la información del usuario logeado
     
     return (
         <AuthenticatedLayout
             user={auth.user} // Pasamos el usuario al Layout
-            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Mesa de Ayuda 🙋‍♀️</h2>}
+            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Repositorio de Documentos 📄</h2>}
         >
-            <Head title="Mesa de Ayuda" />
+            <Head title="Documentos" />
 
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                        <h3 className="text-lg font-medium text-gray-900">Bienvenido a la Mesa de Ayuda, {auth.user.name}.</h3>
+                        <h3 className="text-lg font-medium text-gray-900">Bienvenido al Repositorio, {auth.user.name}.</h3>
                         <p className="mt-1 text-sm text-gray-600">
-                            En este módulo puedes crear, seguir y resolver tickets de soporte técnico.
+                            Encuentra aquí la documentación interna, manuales de usuario y archivos importantes.
                         </p>
                         
-                        {/* Aquí iría el contenido específico: lista de tickets, botón para nuevo ticket. */}
+                        {/* Aquí iría el contenido específico: lista de archivos, opciones de subida/descarga. */}
                     </div>
                 </div>
             </div>

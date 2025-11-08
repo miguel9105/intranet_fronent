@@ -4,7 +4,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use Illuminate\Http\Request; // ⚠️ IMPORTANTE: Necesitas importar Request
+use Illuminate\Http\Request; //  IMPORTANTE: Necesitas importar Request
 
 /*
 |--------------------------------------------------------------------------
@@ -28,8 +28,10 @@ Route::get('/contacto', function () {
     return Inertia::render('Contact');
 })->name('contact');
 
+
+
 // =========================================================================
-// ✅ RUTAS PROTEGIDAS POR EL MIDDLEWARE 'auth.token'
+// RUTAS PROTEGIDAS POR EL MIDDLEWARE 'auth.token'
 // =========================================================================
 
 Route::middleware(['auth.token'])->group(function () {
@@ -44,24 +46,24 @@ Route::middleware(['auth.token'])->group(function () {
         ];
     };
     
-    // ➡️ RUTA DEL DASHBOARD (AHORA PROTEGIDA CON TOKEN)
+    //  RUTA DEL DASHBOARD (AHORA PROTEGIDA CON TOKEN)
     Route::get('/dashboard', function (Request $request) use ($authProps) {
-        return Inertia::render('Dashboard', $authProps($request)); // ⬅️ 
+        return Inertia::render('Dashboard', $authProps($request)); // ⬅
     })->name('dashboard');
 
     // Inventario
     Route::get('/inventario', function (Request $request) use ($authProps) {
-        return Inertia::render('Inventario/Index', $authProps($request)); // ⬅️ Pasa la data aquí
+        return Inertia::render('Inventario/Index', $authProps($request)); // ⬅ Pasa la data aquí
     })->name('inventario');
 
     // Mesa de Ayuda
     Route::get('/mesa-de-ayuda', function (Request $request) use ($authProps) {
-        return Inertia::render('MesaDeAyuda/Index', $authProps($request)); // ⬅️ Pasa la data aquí
+        return Inertia::render('MesaDeAyuda/Index', $authProps($request)); // ⬅Pasa la data aquí
     })->name('mesa-de-ayuda');
 
     // Documentos
     Route::get('/documentos', function (Request $request) use ($authProps) {
-        return Inertia::render('Documentos/Index', $authProps($request)); // ⬅️ Pasa la data aquí
+        return Inertia::render('Documentos/Index', $authProps($request)); // ⬅ Pasa la data aquí
     })->name('documentos');
     
 });

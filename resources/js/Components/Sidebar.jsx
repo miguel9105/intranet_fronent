@@ -4,12 +4,14 @@ import React from 'react';
 import { ArchiveBoxIcon, LifebuoyIcon, DocumentTextIcon, ArrowLeftEndOnRectangleIcon, ChevronDoubleLeftIcon, HomeIcon } from '@heroicons/react/24/outline'; // Iconos llamativos
 
 const NavItem = ({ href, active, children, icon: Icon }) => {
-    const isActive = active || route().current(href);
+    // Usamos el nombre de la ruta para verificar si está activo
+    const isActive = active || route().current(href); 
     const baseClasses = "flex items-center p-3 my-2 transition-colors duration-200 rounded-lg hover:bg-indigo-600 group";
     const activeClasses = isActive ? "bg-indigo-600 shadow-md transform scale-[1.02]" : "hover:shadow-md";
 
     return (
         <Link 
+            // Usa route(href) donde 'href' es el nombre de la ruta (ej: 'inventario')
             href={route(href)} 
             className={`${baseClasses} ${activeClasses} ${isActive ? 'text-white' : 'text-indigo-200'}`}
         >
@@ -31,6 +33,8 @@ export default function Sidebar({ primaryColor }) {
 
             {/* Opciones de Navegación */}
             <nav className="flex-1 space-y-2">
+                {/* Estas rutas coinciden con los nombres definidos en web.php: 
+                    'dashboard', 'inventario', 'mesa-de-ayuda', 'documentos' */}
                 <NavItem href="dashboard" icon={HomeIcon}>Dashboard</NavItem>
                 <NavItem href="inventario" icon={ArchiveBoxIcon}>Inventario</NavItem>
                 <NavItem href="mesa-de-ayuda" icon={LifebuoyIcon}>Mesa de Ayuda</NavItem>
@@ -40,6 +44,7 @@ export default function Sidebar({ primaryColor }) {
             {/* Cerrar Sesión (al final) */}
             <div className="mt-auto pt-4 border-t border-indigo-500/50">
                 <Link
+                    // Usa el nombre de la ruta de cierre de sesión
                     href={route('logout')}
                     method="post"
                     as="button"
