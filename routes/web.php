@@ -4,7 +4,8 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use Illuminate\Http\Request; //  IMPORTANTE: Necesitas importar Request
+use Illuminate\Http\Request; 
+use Illuminate\Support\Facades\Auth; // Añadido para el logout
 
 /*
 |--------------------------------------------------------------------------
@@ -29,45 +30,54 @@ Route::get('/contacto', function () {
 })->name('contact');
 
 
-
 // =========================================================================
 // RUTAS PROTEGIDAS POR EL MIDDLEWARE 'auth.token'
 // =========================================================================
 
 Route::middleware(['auth.token'])->group(function () {
     
-    // Función de ayuda para pasar los props de autenticación (auth) a Inertia
-    $authProps = function (Request $request) {
-        return [
-            'auth' => [
-                // Solo pasa los datos del usuario necesarios
-                'user' => $request->user() ? $request->user()->only('id', 'name', 'email') : ['name' => 'invitado', 'email' => ''],
-            ],
-        ];
-    };
+  $authProps = function (Request $request) {
+    $user = $request->user();
     
-    //  RUTA DEL DASHBOARD (AHORA PROTEGIDA CON TOKEN)
+    $userData = $user ? $user->only('id', 'name', 'email') : ['name' => 'invitado', 'email' => ''];
+
+    if ($user) {
+        // LÍNEA CRÍTICA
+        $userData['role_names'] = $user->role_names; 
+    }
+
+    return [
+        'auth' => [
+            'user' => $userData,
+        ],
+    ];
+};
+    // RUTA DEL DASHBOARD (CRÍTICA)
     Route::get('/dashboard', function (Request $request) use ($authProps) {
-        return Inertia::render('Dashboard', $authProps($request)); // ⬅
+        return Inertia::render('Dashboard', $authProps($request));
     })->name('dashboard');
 
     // Inventario
     Route::get('/inventario', function (Request $request) use ($authProps) {
-        return Inertia::render('Inventario/Index', $authProps($request)); // ⬅ Pasa la data aquí
+        return Inertia::render('Inventario/Index', $authProps($request)); 
     })->name('inventario');
 
     // Mesa de Ayuda
     Route::get('/mesa-de-ayuda', function (Request $request) use ($authProps) {
-        return Inertia::render('MesaDeAyuda/Index', $authProps($request)); // ⬅Pasa la data aquí
+        return Inertia::render('MesaDeAyuda/Index', $authProps($request));
     })->name('mesa-de-ayuda');
 
-    // Documentos
-    Route::get('/documentos', function (Request $request) use ($authProps) {
-        return Inertia::render('Documentos/Index', $authProps($request)); // ⬅ Pasa la data aquí
-    })->name('documentos');
-    
-});
-// =========================================================================
+   // RUTA PARA EL MÓDULO DE DOCUMENTOS Y PROCESAMIENTO
+   Route::get('/documentos', function (Request $request) use ($authProps) {
+        // La ruta es más simple ya que los roles van incluidos en $authProps
+        return Inertia::render('Documentos', $authProps($request)); 
+    })->middleware('role:Administrador,Gestor')->name('documentos');
 
-// Incluye las rutas de logout 
-require __DIR__.'/auth.php';
+    // Rutas de Cierre de Sesión (usando Inertia Post)
+    Route::post('logout', function (Request $request) {
+        Auth::guard('web')->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return redirect('/login');
+    })->name('logout');
+});

@@ -1,3 +1,4 @@
+// resources/js/Pages/Dashboard.jsx
 import React from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
@@ -5,12 +6,14 @@ import {
     HomeIcon, 
     ArchiveBoxIcon, 
     LifebuoyIcon, 
-    CalendarDaysIcon, // Nuevo icono para el calendario
-    ChartBarIcon,    // Nuevo icono para objetivos
-    NewspaperIcon,   // Nuevo icono para anuncios
+    CalendarDaysIcon, 
+    ChartBarIcon,    
+    ClipboardDocumentCheckIcon, 
+    DocumentTextIcon, // Asegúrate de que este icono está importado
 } from '@heroicons/react/24/outline';
 
-// --- Componente de Tarjeta de Estadísticas (Se mantiene igual) ---
+
+// --- Componente de Tarjeta de Estadísticas (Se mantiene) ---
 const StatCard = ({ title, value, icon: Icon, colorClass }) => (
     <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 transition duration-300 hover:shadow-xl">
         <div className="flex items-center justify-between">
@@ -25,21 +28,21 @@ const StatCard = ({ title, value, icon: Icon, colorClass }) => (
     </div>
 );
 
-// --- Componente para Tarjeta de Objetivos ---
+// --- Componente para Tarjeta de Objetivos (Se mantiene) ---
 const GoalCard = ({ title, current, target, unit, colorClass }) => {
     const progress = Math.min(100, (current / target) * 100);
 
     return (
         <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
-            <div className="flex items-start justify-between">
+            <div className="flex justify-between items-start">
                 <div>
                     <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
-                    <p className="text-3xl font-bold text-gray-900 mt-2">
-                        {current.toLocaleString()} / {target.toLocaleString()} 
-                        <span className="text-sm font-medium text-gray-500 ml-1">{unit}</span>
+                    <p className="text-2xl font-bold text-gray-900 mt-1">
+                        {current}
+                        <span className="text-base font-normal text-gray-500"> / {target} {unit}</span>
                     </p>
                 </div>
-                <ChartBarIcon className={`w-8 h-8 ${colorClass} opacity-75`} />
+                <ChartBarIcon className={`w-8 h-8 ${colorClass}`} />
             </div>
             
             <div className="mt-4">
@@ -47,145 +50,136 @@ const GoalCard = ({ title, current, target, unit, colorClass }) => {
                     <div 
                         className={`h-2.5 rounded-full ${colorClass}`} 
                         style={{ width: `${progress}%` }}
+                        aria-valuenow={current}
+                        aria-valuemin="0"
+                        aria-valuemax={target}
                     ></div>
                 </div>
-                <p className="text-xs text-gray-500 mt-1 text-right">
-                    Progreso: **{progress.toFixed(1)}%**
-                </p>
+                <p className="text-sm font-medium text-gray-500 mt-1">{progress.toFixed(0)}% Completado</p>
             </div>
         </div>
     );
 };
 
-// --- Componente para Calendario y Cumpleaños ---
-const CalendarAndBirthdays = ({ birthdays }) => (
-    <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
-        <h3 className="flex items-center text-xl font-semibold text-gray-800 mb-4">
-            <CalendarDaysIcon className="w-6 h-6 mr-2 text-indigo-600" /> 
-            Calendario & Cumpleaños
-        </h3>
-        
-        {/* Simulación de un Calendario (Puedes reemplazarlo con un componente real) */}
-        <div className="h-40 flex items-center justify-center bg-gray-50 rounded-lg border border-dashed border-gray-300 mb-4">
-             <p className="text-gray-500">Vista del mes actual</p>
+// --- Componente para Tareas y Anuncios (Ejemplo) ---
+const TaskList = ({ tasks }) => (
+    <div className="bg-white p-8 rounded-2xl shadow-lg border border-gray-100">
+        <div className="flex justify-between items-center mb-4">
+            <h3 className="text-xl font-semibold text-gray-800">✅ Tareas Pendientes</h3>
+            <span className="text-sm font-bold text-indigo-600">{tasks.length}</span>
         </div>
-
-        <h4 className="text-lg font-medium text-gray-800 mb-2">Próximos Cumpleaños 🥳</h4>
-        <ul className="space-y-2">
-            {birthdays.map((bday, index) => (
-                <li key={index} className="flex justify-between items-center text-sm">
-                    <span className="text-gray-900 font-medium">{bday.name}</span>
-                    <span className="px-2 py-0.5 bg-yellow-100 text-yellow-800 rounded-full text-xs font-semibold">
-                        {bday.date}
-                    </span>
+        <ul className="space-y-3">
+            {tasks.slice(0, 5).map((task, index) => (
+                <li key={index} className="flex items-start p-3 bg-gray-50 rounded-lg">
+                    <ClipboardDocumentCheckIcon className="w-5 h-5 text-green-500 flex-shrink-0 mt-1" />
+                    <div className="ml-3">
+                        <p className="text-sm font-medium text-gray-900">{task.title}</p>
+                        <p className="text-xs text-gray-500">Vence: {task.due}</p>
+                    </div>
                 </li>
             ))}
         </ul>
     </div>
 );
 
-// --- Componente para Carrusel de Anuncios (Simplificado para el ejemplo) ---
-const AnnouncementCarousel = ({ announcements }) => {
-    // Aquí se implementaría la lógica de un carrusel (ej. estado de índice, botones de navegación)
-    // Para este ejemplo, solo mostramos el primer anuncio.
-
-    if (announcements.length === 0) return null;
-
-    const currentAnnouncement = announcements[0]; // Mostrar solo el primero por simplicidad
-
-    return (
-        <div className="bg-indigo-600 p-8 rounded-2xl shadow-lg text-white mb-12 flex items-center justify-between transition duration-300 hover:bg-indigo-700">
-            <NewspaperIcon className="w-10 h-10 mr-4 opacity-75 hidden sm:block" />
-            <div>
-                <p className="text-sm font-light uppercase opacity-90">Anuncio Destacado ({announcements.length} en total)</p>
-                <h3 className="text-2xl font-bold mt-1">{currentAnnouncement.title}</h3>
-                <p className="mt-2 text-sm opacity-90">{currentAnnouncement.content.substring(0, 100)}...</p>
-                <button className="mt-3 text-sm font-semibold underline hover:no-underline">
-                    Ver más &rarr;
-                </button>
+// --- Componente para Calendario y Cumpleaños (Ejemplo) ---
+const CalendarAndBirthdays = ({ birthdays }) => (
+    <div className="bg-white p-8 rounded-2xl shadow-lg border border-gray-100">
+        <h3 className="text-xl font-semibold text-gray-800 mb-4">🗓️ Eventos y Cumpleaños</h3>
+        <div className="space-y-4">
+            {birthdays.map((b, index) => (
+                <div key={index} className="flex items-center p-3 border-b border-gray-100 last:border-b-0">
+                    <CalendarDaysIcon className="w-6 h-6 text-red-500 flex-shrink-0" />
+                    <div className="ml-3">
+                        <p className="text-sm font-medium text-gray-900">{b.name}</p>
+                        <p className="text-xs text-gray-500">{b.date} - ¡Cumpleaños!</p>
+                    </div>
+                </div>
+            ))}
+            <div className="text-center pt-2">
+                <a href="#" className="text-sm font-medium text-indigo-600 hover:text-indigo-800">Ver Calendario Completo</a>
             </div>
         </div>
-    );
-};
+    </div>
+);
 
 
-// --- Página Principal del Dashboard ---
 export default function Dashboard({ auth }) {
-    const userName = auth.user.name.split(' ')[0];
     
-    // --- DATOS DE EJEMPLO ---
+    // Datos de ejemplo
     const stats = [
-        { title: 'Inventario Total', value: '4,500', icon: ArchiveBoxIcon, colorClass: 'text-blue-600' },
-        { title: 'Tickets Abiertos', value: '12', icon: LifebuoyIcon, colorClass: 'text-red-600' },
-        { title: 'Usuarios Conectados', value: '87', icon: HomeIcon, colorClass: 'text-green-600' },
+        { title: "Usuarios Activos", value: "1,200", icon: HomeIcon, colorClass: 'text-indigo-600' },
+        { title: "Reportes Generados", value: "450", icon: DocumentTextIcon, colorClass: 'text-green-600' },
+        { title: "Tickets Abiertos", value: "12", icon: LifebuoyIcon, colorClass: 'text-red-600' },
+        { title: "Inventario Total", value: "8,900", icon: ArchiveBoxIcon, colorClass: 'text-yellow-600' },
     ];
     
     const companyGoals = [
-        { title: 'Nuevos Clientes Q4', current: 45, target: 100, unit: 'Clientes', colorClass: 'bg-teal-500' },
-        { title: 'Reducción de Gastos', current: 15000, target: 50000, unit: 'USD', colorClass: 'bg-orange-500' },
-        { title: 'Proyectos Entregados', current: 8, target: 10, unit: 'Proyectos', colorClass: 'bg-purple-500' },
+        { title: "Reducción de Gastos", current: 5000, target: 10000, unit: 'USD', colorClass: 'bg-green-500' },
+        { title: "Capacitaciones", current: 8, target: 12, unit: 'Módulos', colorClass: 'bg-blue-500' },
     ];
 
     const upcomingBirthdays = [
-        { name: 'Ana M. (Marketing)', date: 'Nov 15' },
-        { name: 'Carlos R. (Ventas)', date: 'Nov 28' },
-        { name: 'Elena S. (Soporte)', date: 'Dic 02' },
+        { name: "Ana P. (Ventas)", date: "15 Nov" },
+        { name: "Juan C. (IT)", date: "22 Nov" },
     ];
 
-    const announcements = [
-        { title: 'Lanzamiento de la Versión 3.0', content: 'La nueva versión de nuestro producto principal se lanzará el próximo lunes. ¡Prepárense para las nuevas características!', date: 'Nov 10' },
-        { title: 'Cierre Fiscal Anual', content: 'Recuerden enviar todos los reportes de gastos antes del 30 de noviembre para el cierre fiscal. ¡No demoren!', date: 'Nov 05' },
+    const myTasks = [
+        { title: "Revisar presupuesto Q4", due: "Hoy" },
+        { title: "Aprobar vacaciones", due: "17 Nov" },
+        { title: "Reunión de gerencia", due: "18 Nov" },
     ];
-    // --- FIN DATOS DE EJEMPLO ---
-    
+
     return (
         <AuthenticatedLayout
-            auth={auth} 
-            header={'Panel Principal'}
+            auth={auth} // Pasa el prop 'auth' al Layout
+            header={
+                <h2 className="font-semibold text-xl text-gray-800 leading-tight">Dashboard General</h2>
+            }
         >
             <Head title="Dashboard" />
 
-            <div className="py-4">
-                
-                <h2 className="text-3xl font-bold text-gray-800 mb-6">
-                    ¡Hola, **{userName}**! Tienes el control total.
-                </h2>
-                
-                {/* 1. Carrusel de Noticias/Anuncios */}
-                <AnnouncementCarousel announcements={announcements} />
+            <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                {/* 1. Bienvenida */}
+                <div className="mb-8 p-6 bg-white rounded-2xl shadow-lg border border-indigo-100">
+                    <h1 className="text-3xl font-bold text-gray-800">
+                        ¡Hola, {auth.user.name}! 👋
+                    </h1>
+                    <p className="text-gray-600 mt-2">
+                        Tu rol actual: <span className="font-semibold text-indigo-600">
+                            {/* Mostrar el array de roles unido por coma */}
+                            {auth.user.role_names ? auth.user.role_names.join(', ') : 'Invitado'}
+                        </span>.
+                    </p>
+                </div>
 
-                {/* 2. Grid de Tarjetas de Estadísticas */}
-                <h3 className="text-2xl font-semibold text-gray-800 mb-4 mt-8">📊 Resumen Operacional</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+                {/* 2. Tarjetas de Estadísticas */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
                     {stats.map((stat, index) => (
-                        <StatCard 
-                            key={index}
-                            title={stat.title}
-                            value={stat.value}
-                            icon={stat.icon}
-                            colorClass={stat.colorClass}
-                        />
+                        <StatCard key={index} {...stat} />
                     ))}
                 </div>
 
-                {/* 3. Grid de Objetivos de la Empresa */}
-                <h3 className="text-2xl font-semibold text-gray-800 mb-4">🎯 Objetivos Trimestrales</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-                    {companyGoals.map((goal, index) => (
-                        <GoalCard 
-                            key={index}
-                            title={goal.title}
-                            current={goal.current}
-                            target={goal.target}
-                            unit={goal.unit}
-                            colorClass={goal.colorClass}
-                        />
-                    ))}
+                {/* 3. Objetivos de la Empresa y Tareas */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
+                     <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {companyGoals.map((goal, index) => (
+                            <GoalCard 
+                                key={index}
+                                title={goal.title}
+                                current={goal.current}
+                                target={goal.target}
+                                unit={goal.unit}
+                                colorClass={goal.colorClass}
+                            />
+                        ))}
+                     </div>
+                    <TaskList tasks={myTasks} />
                 </div>
 
                 {/* 4. Contenido Adicional: Gráficos y Calendario */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    {/* Gráfico de Tendencias (se mantiene) */}
+                    {/* Gráfico de Tendencias */}
                     <div className="lg:col-span-2 bg-white p-8 rounded-2xl shadow-lg border border-gray-100">
                         <h3 className="text-xl font-semibold text-gray-800 mb-4">📈 Gráfico de Tendencias</h3>
                         <div className="h-64 flex items-center justify-center bg-gray-50 rounded-lg border border-dashed border-gray-300">
@@ -195,7 +189,7 @@ export default function Dashboard({ auth }) {
                         </div>
                     </div>
 
-                    {/* Calendario y Cumpleaños (Nuevo) */}
+                    {/* Calendario y Cumpleaños */}
                     <CalendarAndBirthdays birthdays={upcomingBirthdays} />
                 </div>
             </div>

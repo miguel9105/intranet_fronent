@@ -2,7 +2,7 @@
 import React from 'react';
 import GuestLayout from '@/Layouts/GuestLayout';
 import AreaCard from '@/Components/AreaCard';
-import EmpresaCard from '@/Components/EmpresaCard';
+// import EmpresaCard from '@/Components/EmpresaCard'; // <--- ELIMINADO
 // Se agrega FaMapMarkerAlt para las ciudades
 import { FaChartLine, FaHandshake, FaMoneyBillWave, FaUsers, FaCalculator, FaBuilding, FaGlobe, FaBriefcase, FaCode, FaMapMarkerAlt } from 'react-icons/fa';
 
@@ -26,7 +26,7 @@ const empresas = [
     { 
         name: 'ElectroCréditos del Cauca', 
         logoUrl: '/images/logos/electrocreditos.jpg', 
-        websiteUrl: 'https://www.electrocreditoscauca.com', 
+        websiteUrl: 'https://electrocreditosdelcaucamuebles.com', 
         description: 'Entidad líder en la región, enfocada en microcréditos para emprendedores y pymes.' 
     },
     // Se elimina Innovatech Solutions
@@ -41,7 +41,7 @@ const metricas = [
     { value: '15+', label: 'Años de Experiencia', icon: <FaBriefcase className="text-4xl text-yellow-300 mb-3" /> },
     { value: '250M', label: 'Créditos Aprobados (USD)', icon: <FaMoneyBillWave className="text-4xl text-yellow-300 mb-3" /> },
     { value: '1.2K', label: 'Colaboradores Activos', icon: <FaUsers className="text-4xl text-yellow-300 mb-3" /> },
-    { value: '5', label: 'Empresas Aliadas', icon: <FaGlobe className="text-4xl text-yellow-300 mb-3" /> },
+    { value: '2', label: 'Empresas Aliadas', icon: <FaGlobe className="text-4xl text-yellow-300 mb-3" /> },
 ];
 // -----------------------
 
@@ -74,26 +74,26 @@ export default function Home(props) {
                 {/* Contenido Centrado con animaciones de entrada individuales */}
                 <div className="relative z-10 text-center max-w-4xl">
                     <h1 className="text-8xl font-black leading-tight mb-6 
-                                     text-yellow-300 drop-shadow-lg 
-                                     animate-fade-in-up animate-delay-100"> 
+                                         text-yellow-300 drop-shadow-lg 
+                                         animate-fade-in-up animate-delay-100"> 
                         PORTAL LABORAL
                     </h1>
                     <h2 className="text-3xl font-semibold uppercase tracking-widest text-pink-400 mb-4
-                                     animate-fade-in-up animate-delay-200">
+                                         animate-fade-in-up animate-delay-200">
                         INTRANET CENTRALIZADA
                     </h2>
                     
                     <p className="text-xl mb-10 font-light opacity-90 max-w-2xl mx-auto
-                                     animate-fade-in-up animate-delay-300">
+                                         animate-fade-in-up animate-delay-300">
                         Descubre tu próximo paso. Conecta con el equipo, gestiona tus documentos y accede a la bolsa de empleo interna de todas nuestras asociadas.
                     </p>
                     
                     {/* Botón Principal (Más grande y llamativo) */}
                     <button 
                         className="bg-red-600 text-white py-4 px-16 text-2xl font-bold rounded-full 
-                                     shadow-2xl hover:bg-red-700 transition duration-300 transform hover:scale-105 
-                                     ring-4 ring-red-400/50 hover:ring-red-400 
-                                     animate-fade-in-up animate-delay-400"
+                                         shadow-2xl hover:bg-red-700 transition duration-300 transform hover:scale-105 
+                                         ring-4 ring-red-400/50 hover:ring-red-400 
+                                         animate-fade-in-up animate-delay-400"
                     >
                         Acceso Rápido al Empleo
                     </button>
@@ -111,7 +111,7 @@ export default function Home(props) {
                             <div 
                                 key={index} 
                                 className="p-6 bg-white rounded-xl shadow-lg border-t-4 border-violet-600 
-                                           transform hover:scale-105 transition duration-300"
+                                             transform hover:scale-105 transition duration-300"
                             >
                                 {metric.icon}
                                 <p className="text-4xl font-extrabold text-violet-900 mb-1">{metric.value}</p>
@@ -159,7 +159,7 @@ export default function Home(props) {
                     <a 
                         href="/cultura" 
                         className="bg-violet-900 text-white py-3 px-8 text-lg font-bold rounded-full 
-                                     shadow-lg hover:bg-violet-800 transition duration-300 transform hover:scale-105"
+                                         shadow-lg hover:bg-violet-800 transition duration-300 transform hover:scale-105"
                     >
                         Conoce Nuestra Cultura
                     </a>
@@ -175,19 +175,37 @@ export default function Home(props) {
                         <span className="border-b-4 border-yellow-400 pb-1">Nuestra Red de Aliados</span> 🤝
                     </h2>
                     
-                    {/* Contenedor de Empresas: Se ajusta el grid para 2 elementos centrados */}
+                    {/* Contenedor de Empresas: IMPLEMENTACIÓN SIN EMPRESACARD */}
                     <div className="flex flex-wrap justify-center gap-8 mb-16">
                         {empresas.map((empresa, index) => (
-                            <div 
+                            <a 
                                 key={index} 
-                                // Ajuste clave: Ocupa mitad en pantallas grandes y total en móvil, y se centra con justify-center del padre.
-                                className="w-full sm:w-[80%] lg:w-[45%] min-w-[300px] transition duration-500 ease-in-out transform hover:translate-y-[-5px]"
+                                href={empresa.websiteUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="block w-full sm:w-[80%] lg:w-[45%] min-w-[300px] p-6 bg-white 
+                                           rounded-xl shadow-lg border-t-4 border-red-500 
+                                           text-center hover:shadow-2xl transition duration-300 transform hover:scale-[1.02]"
                             >
-                                <EmpresaCard data={empresa} />
-                            </div>
+                                {/* Imagen/Logo */}
+                                <img 
+                                    src={empresa.logoUrl} 
+                                    alt={`Logo de ${empresa.name}`}
+                                    className="h-16 mx-auto mb-4 object-contain"
+                                />
+                                {/* Nombre */}
+                                <h4 className="text-2xl font-bold text-violet-900 mb-2">{empresa.name}</h4>
+                                {/* Descripción */}
+                                <p className="text-gray-600 mb-4">{empresa.description}</p>
+                                {/* Botón/Enlace */}
+                                <span className="text-red-500 font-semibold text-sm hover:underline">
+                                    Visitar sitio web &rarr;
+                                </span>
+                            </a>
                         ))}
                     </div>
-                    
+                    {/* FIN DE IMPLEMENTACIÓN MANUAL */}
+
                     <hr className="border-red-300 my-10" />
 
                     {/* NUEVO: SECCIÓN DE CIUDADES ACTIVAS */}

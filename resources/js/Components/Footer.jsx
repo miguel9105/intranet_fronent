@@ -9,7 +9,8 @@ const FooterLink = ({ href, children }) => (
     <li>
         <Link 
             href={href} 
-            className="text-gray-400 hover:text-red-500 transition duration-200 ease-in-out text-sm block py-1"
+            // Enlaces de texto en gris claro, hover en amarillo-300 (el color de acento del Home)
+            className="text-gray-400 hover:text-yellow-300 transition duration-200 ease-in-out text-sm block py-1"
         >
             {children}
         </Link>
@@ -18,33 +19,39 @@ const FooterLink = ({ href, children }) => (
 
 // Componente para los iconos de utilidad/sociales
 const IconWrapper = ({ children }) => (
-    <span className="p-3 border border-gray-700 rounded-full text-lg cursor-pointer hover:bg-gray-800 hover:text-red-500 transition duration-300">
+    <span 
+        // Borde y hover en color red-600/violet-600 para un look más moderno y coordinado
+        className="p-3 border border-violet-800 rounded-full text-lg cursor-pointer 
+                   hover:bg-red-600 hover:text-white transition duration-300"
+    >
         {children}
     </span>
 );
 
 export default function Footer() {
     return (
-        <footer className="bg-gray-950 text-white pt-12 pb-6">
+        // Fondo oscuro violeta/negro
+        <footer className="bg-violet-950 text-white pt-12 pb-6">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 
                 {/* Contenedor Superior (Iconos de Utilidad y Social) */}
-                <div className="flex flex-col md:flex-row justify-between items-center pb-8 border-b border-gray-800 mb-8 space-y-6 md:space-y-0">
+                <div className="flex flex-col md:flex-row justify-between items-center pb-8 
+                                border-b border-violet-800 mb-8 space-y-6 md:space-y-0">
                     
-                    {/* Logo/Marca */}
-                    <div className="text-2xl font-extrabold text-red-600 tracking-wide">
-                        ElectroCréditos
+                    {/* Logo/Marca: Usamos el color amarillo-300 del título principal del Home */}
+                    <div className="text-2xl font-extrabold text-yellow-300 tracking-wide">
+                        PORTAL CENTRALIZADO
                     </div>
 
                     {/* Iconos de Utilidad */}
-                    <div className="flex space-x-4 text-gray-400">
+                    <div className="flex space-x-4 text-gray-300">
                         <IconWrapper><FaSearch /></IconWrapper>
                         <IconWrapper><FaCogs /></IconWrapper>
                         <IconWrapper><FaSitemap /></IconWrapper>
                     </div>
 
                     {/* Iconos Sociales */}
-                    <div className="flex space-x-6 text-gray-400">
+                    <div className="flex space-x-6 text-gray-300">
                         <IconWrapper><FaFacebook /></IconWrapper>
                         <IconWrapper><FaInstagram /></IconWrapper>
                         <IconWrapper><FaYoutube /></IconWrapper>
@@ -54,57 +61,59 @@ export default function Footer() {
 
                 {/* Grid de Enlaces de Navegación del Footer */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+                    
                     {/* Columna 1: Utilities */}
                     <div>
-                        <h4 className="text-white font-bold mb-4 border-b border-red-500 pb-1 inline-block">Utilities</h4>
+                        {/* Borde de título en rojo-600 (el color del CTA principal) */}
+                        <h4 className="text-white font-bold mb-4 border-b border-red-600 pb-1 inline-block">Funciones Internas</h4>
                         <ul className="space-y-1">
-                            <FooterLink href="#">Mi Cuenta</FooterLink>
-                            <FooterLink href="#">Facturación</FooterLink>
-                            <FooterLink href="#">Blog/Writing</FooterLink>
-                            <FooterLink href="#">Online Scheduling</FooterLink>
-                            <FooterLink href="#">Team Collaboration</FooterLink>
+                            <FooterLink href="#">Mi Perfil / Hoja de Vida</FooterLink>
+                            <FooterLink href="#">Nómina y Certificados</FooterLink>
+                            <FooterLink href="#">Acceso a Cursos</FooterLink>
+                            <FooterLink href="#">Agenda de Reuniones</FooterLink>
+                            <FooterLink href="#">Documentos Corporativos</FooterLink>
                         </ul>
                     </div>
 
                     {/* Columna 2: Explore */}
                     <div>
-                        <h4 className="text-white font-bold mb-4 border-b border-red-500 pb-1 inline-block">Explore</h4>
+                        <h4 className="text-white font-bold mb-4 border-b border-red-600 pb-1 inline-block">Explorar Oportunidades</h4>
                         <ul className="space-y-1">
-                            <FooterLink href="#">Docs</FooterLink>
-                            <FooterLink href="#">Pricing</FooterLink>
-                            <FooterLink href="#">Design System</FooterLink>
-                            <FooterLink href="#">Integrations</FooterLink>
-                            <FooterLink href="#">Teams</FooterLink>
+                            <FooterLink href="#">Bolsa de Empleo</FooterLink>
+                            <FooterLink href="#">Empresas Aliadas</FooterLink>
+                            <FooterLink href="#">Nuestras Áreas</FooterLink>
+                            <FooterLink href="#">Noticias del Sector</FooterLink>
+                            <FooterLink href="#">Cultura y Valores</FooterLink>
                         </ul>
                     </div>
 
                     {/* Columna 3: Resources */}
                     <div>
-                        <h4 className="text-white font-bold mb-4 border-b border-red-500 pb-1 inline-block">Resources</h4>
+                        <h4 className="text-white font-bold mb-4 border-b border-red-600 pb-1 inline-block">Soporte y Recursos</h4>
                         <ul className="space-y-1">
-                            <FooterLink href="#">Blog</FooterLink>
-                            <FooterLink href="#">News</FooterLink>
-                            <FooterLink href="#">Learn Code</FooterLink>
-                            <FooterLink href="#">DevStream</FooterLink>
-                            <FooterLink href="#">Reference Library</FooterLink>
+                            <FooterLink href="#">Manual de Usuario</FooterLink>
+                            <FooterLink href="#">Contacto TI</FooterLink>
+                            <FooterLink href="#">Política de Datos</FooterLink>
+                            <FooterLink href="#">Preguntas Frecuentes</FooterLink>
+                            <FooterLink href="#">Reportar un Incidente</FooterLink>
                         </ul>
                     </div>
 
                     {/* Columna 4: Legal/Contact */}
                     <div>
-                        <h4 className="text-white font-bold mb-4 border-b border-red-500 pb-1 inline-block">Legal & Contacto</h4>
+                        <h4 className="text-white font-bold mb-4 border-b border-red-600 pb-1 inline-block">Legal y Ubicación</h4>
                         <ul className="space-y-1">
-                            <FooterLink href="#">Términos</FooterLink>
-                            <FooterLink href="#">Privacidad</FooterLink>
-                            <FooterLink href="#">Soporte</FooterLink>
-                            <FooterLink href="#">Oficinas</FooterLink>
+                            <FooterLink href="#">Términos y Condiciones</FooterLink>
+                            <FooterLink href="#">Política de Privacidad</FooterLink>
+                            <FooterLink href="#">Contactar Talento Humano</FooterLink>
+                            <FooterLink href="#">Sedes y Oficinas</FooterLink>
                         </ul>
                     </div>
                 </div>
 
                 {/* Copyright/Derechos */}
-                <div className="mt-12 text-center text-gray-600 text-xs border-t border-gray-800 pt-6">
-                    &copy; {new Date().getFullYear()} ElectroCréditos. Todos los derechos reservados. Desarrollado con Laravel & React.
+                <div className="mt-12 text-center text-gray-500 text-xs border-t border-violet-800 pt-6">
+                    &copy; {new Date().getFullYear()} Intranet Corporativa. Todos los derechos reservados. Desarrollado con Laravel & React.
                 </div>
             </div>
         </footer>

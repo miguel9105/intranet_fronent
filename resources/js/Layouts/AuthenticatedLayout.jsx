@@ -1,118 +1,116 @@
 // resources/js/Layouts/AuthenticatedLayout.jsx
-import React from 'react';
-import { Link, Head } from '@inertiajs/react';
-import axios from 'axios'; 
-import { HomeIcon, ArchiveBoxIcon, LifebuoyIcon, DocumentIcon, CogIcon, ArrowLeftStartOnRectangleIcon } from '@heroicons/react/24/outline'; // Iconos
-
-// Componente de Enlace de Navegación
-const NavLink = ({ href, active, children, icon: Icon }) => {
-    const baseClasses = "flex items-center p-3 rounded-xl transition duration-150 ease-in-out";
-    const activeClasses = "bg-red-600 text-white shadow-md font-semibold";
-    const inactiveClasses = "text-gray-600 hover:bg-red-50 hover:text-red-600 font-medium";
-
-    return (
-        <Link
-            href={href}
-            className={`${baseClasses} ${active ? activeClasses : inactiveClasses}`}
-        >
-            {Icon && <Icon className="w-5 h-5 mr-3" />}
-            {children}
-        </Link>
-    );
-};
+import React, { useState } from 'react';
+import { Link, Head, router } from '@inertiajs/react'; // Importar router
+import Sidebar from '@/Components/Sidebar'; // Asegúrate que la ruta sea correcta
+import { ArrowLeftStartOnRectangleIcon, BellIcon, UserCircleIcon, Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'; // Iconos
 
 // Componente Principal del Layout
 export default function Authenticated({ auth, header, children }) {
-    
+    const user = auth.user;
+    const [sidebarOpen, setSidebarOpen] = useState(true); // Control de visibilidad del sidebar
+
     // Función para manejar el cierre de sesión: Elimina el token y redirige.
     const handleLogout = (e) => {
         e.preventDefault();
         
-        // 1. Opcional: Llamar a la API de Laravel para revocar el token 
-        // axios.post(route('api.logout_token_revocation')); 
-
-        // 2. Eliminar el token de localStorage
+        // 1. Eliminar el token
         localStorage.removeItem('auth_token');
-        
-        // 3. Eliminar el header de Axios
-        delete axios.defaults.headers.common['Authorization'];
 
-        // 4. Redirigir al login (Inertia cargará la página pública)
-        window.location.href = route('login'); 
+        // 2. Usar Inertia POST para llamar a la ruta de logout de Laravel
+        router.post(route('logout'), {}, {
+            onFinish: () => {
+                // Redirigir al login después de que Laravel finalice la sesión
+                router.visit(route('login'));
+            }
+        });
     };
-
-    const user = auth.user;
-
-    const navigation = [
-        { name: 'Dashboard', href: route('dashboard'), icon: HomeIcon, active: route().current('dashboard') },
-        // ✅ Rutas nuevas integradas correctamente
-        { name: 'Inventario', href: route('inventario'), icon: ArchiveBoxIcon, active: route().current('inventario') }, 
-        { name: 'Mesa de Ayuda', href: route('mesa-de-ayuda'), icon: LifebuoyIcon, active: route().current('mesa-de-ayuda') }, 
-        { name: 'Documentos', href: route('documentos'), icon: DocumentIcon, active: route().current('documentos') },
-        { name: 'Configuración', href: '#', icon: CogIcon, active: false }, 
-    ];
+    
+    // --- ESTILOS DE LAYOUT ---
+    const primaryColor = 'bg-indigo-700'; // Color primario del sidebar
 
     return (
-        <div className="min-h-screen bg-gray-100 flex">
-            
-            {/* Sidebar */}
-            <aside className="w-64 bg-white shadow-xl flex flex-col p-6 sticky top-0 h-screen">
-                <div className="flex-shrink-0 flex items-center mb-10 border-b pb-4">
-                    <div className="w-8 h-8 rounded-md bg-red-600 mr-3"></div>
-                    <span className="ml-0 text-xl font-bold text-gray-800">Intranet App</span>
-                </div>
+        <div className="flex h-screen bg-gray-100 antialiased">
+            <Head title={header ? header.props.children : 'Dashboard'} />
 
-                {/* Navegación Principal */}
-                <nav className="flex-grow space-y-2">
-                    {navigation.map((item) => (
-                        <NavLink key={item.name} href={item.href} active={item.active} icon={item.icon}>
-                            {item.name}
-                        </NavLink>
-                    ))}
-                </nav>
+            {/* Overlay para móvil */}
+            {sidebarOpen && (
+                <div 
+                    className="fixed inset-0 z-20 bg-black opacity-50 lg:hidden" 
+                    onClick={() => setSidebarOpen(false)}
+                ></div>
+            )}
 
-                {/* Sección de Usuario y Logout */}
-                <div className="pt-4 mt-auto border-t">
-                    <div className="flex items-center p-3">
-                        <div className="flex-shrink-0">
-                            <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-600 font-bold">
-                                {/* Muestra la primera letra del nombre */}
-                                {user.name ? user.name.substring(0, 1) : 'U'}
-                            </div>
-                        </div>
-                        <div className="ml-3 truncate">
-                            <p className="text-sm font-semibold text-gray-800 truncate">{user.name}</p>
-                            <p className="text-xs text-gray-500 truncate">{user.email}</p>
-                        </div>
-                    </div>
-                    
-                    {/* Botón de Logout */}
-                    <button
-                        onClick={handleLogout}
-                        className="w-full flex items-center justify-center p-3 mt-2 text-sm font-medium text-gray-600 rounded-xl hover:bg-gray-200 transition duration-150"
-                    >
-                        <ArrowLeftStartOnRectangleIcon className="w-5 h-5 mr-3" />
-                        Cerrar Sesión
-                    </button>
-                </div>
-            </aside>
+            {/* Sidebar (Menú Lateral) */}
+            <div className={`fixed inset-y-0 left-0 z-30 transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition duration-200 ease-in-out lg:translate-x-0 lg:static lg:inset-0 w-64 ${primaryColor}`}>
+                <Sidebar primaryColor={primaryColor} />
+            </div>
 
             {/* Contenido Principal */}
             <main className="flex-1 flex flex-col overflow-auto">
-                {/* Header */}
-                {header && (
-                    <header className="bg-white shadow-sm sticky top-0 z-10">
-                        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                            <h2 className="font-semibold text-2xl text-gray-800 leading-tight">
-                                {header}
-                            </h2>
+                {/* Header (Barra Superior) */}
+                <header className="bg-white shadow-sm sticky top-0 z-10">
+                    <div className="max-w-full mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+                        <div className="flex items-center">
+                            {/* Botón de toggle para móvil */}
+                            <button
+                                className="text-gray-500 focus:outline-none focus:text-gray-600 lg:hidden mr-3"
+                                onClick={() => setSidebarOpen(!sidebarOpen)}
+                            >
+                                {sidebarOpen ? <XMarkIcon className="w-6 h-6" /> : <Bars3Icon className="w-6 h-6" />}
+                            </button>
+                            
+                            {/* Título de la página */}
+                            {header && (
+                                <h1 className="font-semibold text-2xl text-gray-800 leading-tight">
+                                    {header}
+                                </h1>
+                            )}
                         </div>
-                    </header>
-                )}
+
+                        {/* Perfil y Notificaciones */}
+                        <div className="flex items-center space-x-4">
+                            <button className="text-gray-400 hover:text-gray-500 transition duration-150">
+                                <BellIcon className="w-6 h-6" />
+                            </button>
+
+                            {/* Menú de Perfil (Dropdown simple) */}
+                            <div className="relative group">
+                                <div className="flex items-center cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition duration-150">
+                                    <UserCircleIcon className="w-8 h-8 text-indigo-600 mr-2" />
+                                    <span className="text-sm font-medium text-gray-700 hidden sm:block">{user.name}</span>
+                                </div>
+
+                                {/* Contenido del Dropdown */}
+                                <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-xl z-20 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition duration-300 transform origin-top-right border border-gray-100">
+                                    <div className="p-4">
+                                        <div className="flex items-center mb-4 border-b pb-3">
+                                            <UserCircleIcon className="w-10 h-10 text-indigo-600 mr-3" />
+                                            <div>
+                                                <p className="font-semibold text-gray-800 truncate">{user.name}</p>
+                                                <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                                            </div>
+                                        </div>
+                                        
+                                        {/* Botón de Logout */}
+                                        <button
+                                            onClick={handleLogout}
+                                            className="w-full flex items-center justify-center p-3 mt-2 text-sm font-medium text-gray-600 rounded-xl hover:bg-gray-200 transition duration-150"
+                                        >
+                                            <ArrowLeftStartOnRectangleIcon className="w-5 h-5 mr-3" />
+                                            Cerrar Sesión
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </header>
 
                 {/* Contenido de la Página */}
-                <div className="py-12 px-4 sm:px-6 lg:px-8">
-                    {children}
+                <div className="flex-1 overflow-auto">
+                    <div className="py-6 px-4 sm:px-6 lg:px-8">
+                        {children}
+                    </div>
                 </div>
             </main>
         </div>

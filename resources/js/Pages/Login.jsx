@@ -1,16 +1,18 @@
-// resources/js/Pages/Auth/Login.jsx
-
 import React, { useEffect } from 'react';
-import GuestLayout from '@/Layouts/GuestLayout'; 
-import { Head, Link, useForm, router } from '@inertiajs/react'; 
-import axios from 'axios'; 
+import GuestLayout from '@/Layouts/GuestLayout';
+import { Head, useForm, router } from '@inertiajs/react';
+import axios from 'axios';
+import {
+    ArrowLeftStartOnRectangleIcon,
+    LockClosedIcon,
+    AtSymbolIcon,
+} from '@heroicons/react/24/outline';
 
-// --- CONFIGURACIÓN CRÍTICA: URL DE TU API LOCAL ---
-const API_BASE_URL = 'http://api.intranet.test'; 
-const API_LOGIN_URL = `${API_BASE_URL}/api/users/login`; 
+// --- CONFIGURACIÓN DE API LOCAL ---
+const API_BASE_URL = 'http://api.intranet.test';
+const API_LOGIN_URL = `${API_BASE_URL}/api/users/login`;
 
-export default function Login({ status, canResetPassword }) {
-    
+export default function Login({ status }) {
     const { data, setData, processing, errors, reset, setError } = useForm({
         email: '',
         password: '',
@@ -18,195 +20,190 @@ export default function Login({ status, canResetPassword }) {
     });
 
     useEffect(() => {
-        // Limpia el campo de contraseña al montar el componente
         return () => {
             reset('password');
         };
     }, []);
 
-    // ** FUNCIÓN SUBMIT: Llama a la API de Laravel Local **
+    // --- FUNCIÓN SUBMIT ---
     const submit = async (e) => {
         e.preventDefault();
-        
         setError({});
-        setData(prevData => ({ ...prevData, processing: true })); 
+        setData((prev) => ({ ...prev, processing: true }));
 
         try {
-            // LLAMADA A LA API LOCAL CON AXIOS
             const response = await axios.post(API_LOGIN_URL, {
                 email: data.email,
                 password: data.password,
             });
 
-            // MANEJO DEL ÉXITO Y DEL TOKEN 
-            const token = response.data.access_token || response.data.token; 
-            
-           if (token) {
-                localStorage.setItem('auth_token', token); 
-                router.visit(route('dashboard'), { method: 'get' }); // <--- Redirección con Inertia
-            } else {
-                 setError('email', 'Inicio de sesión exitoso, pero el servidor no devolvió el token de autenticación.');
-            }
+            const token = response.data.access_token || response.data.token;
 
+            if (token) {
+                localStorage.setItem('auth_token', token);
+                router.visit(route('dashboard'), {
+                    method: 'get',
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                    preserveState: false,
+                    preserveScroll: false,
+                });
+            } else {
+                setError('general', 'Acceso denegado. Credenciales inválidas o token no recibido.');
+                setData((prev) => ({ ...prev, processing: false }));
+            }
         } catch (error) {
-            // MANEJO DE ERRORES DETALLADO
-            if (error.response) {
-                const status = error.response.status;
-
-                if (status === 422 && error.response.data.errors) {
-                    // Errores de validación de la API
-                    setError(error.response.data.errors);
-                } else if (status === 401) {
-                    // Credenciales incorrectas
-                    setError('email', 'Las credenciales proporcionadas son incorrectas.');
-                } else {
-                    // Otro error del servidor
-                    setError('email', `Error ${status}: Falló la comunicación con el servidor.`);
-                }
+            const apiErrors = error.response?.data?.errors;
+            if (apiErrors) {
+                Object.keys(apiErrors).forEach((key) => {
+                    setError(key, apiErrors[key][0]);
+                });
             } else {
-                // Error de red, CORS, o API no disponible
-                console.error("Error de Conexión:", error);
-                setError('email', 'Error de red. Asegúrate que la API local (8001) esté corriendo y CORS configurado.');
+                setError(
+                    'general',
+                    error.response?.data?.message || 'Error de conexión o credenciales inválidas.'
+                );
             }
-        } finally {
-             setData(prevData => ({ ...prevData, processing: false }));
+            setData((prev) => ({ ...prev, processing: false }));
         }
     };
 
-    // Componente de Error nativo
-    const FormError = ({ message }) => {
-        return message ? (
-            <span className="text-sm text-red-500 mt-2 block font-medium">
-                {message}
-            </span>
-        ) : null;
-    };
-
     return (
-        // Utilizamos el GuestLayout, como lo solicitaste
-        <GuestLayout> 
-            <Head title="Iniciar Sesión" />
+        <GuestLayout>
+            <Head title="Acceso al Sistema" />
 
-            {/* Contenedor Principal: Efecto de fondo sutil */}
-            <div className="min-h-screen flex items-center justify-center p-4 bg-gray-100">
-                
-                {/* --- CARD PRINCIPAL: ESTILO INNOVADOR (GLASSMORHPISM) --- */}
-                <div className="relative z-10 w-full max-w-md backdrop-filter backdrop-blur-lg bg-white bg-opacity-80 p-8 md:p-10 rounded-2xl 
-                                     shadow-xl border border-gray-200 transition duration-500 transform hover:shadow-2xl">
+            {/* 🎥 Fondo con video colorido */}
+            <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
+                {/* Video de fondo con color realzado */}
+                <video
+                    className="absolute top-0 left-0 w-full h-full object-cover saturate-125 contrast-110 brightness-105"
+                    src="/videos/intranet-bg.mp4" // 👈 Cambia por tu video en public/videos/
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                />
 
-                    {/* Encabezado */}
-                    <div className="text-center mb-10">
-                        <div className="mx-auto w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mb-4 shadow-md">
-                            {/* Icono de llave o candado (simulación de icono) */}
-                            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                        </div>
-                        <h1 className="text-3xl font-extrabold text-gray-800">
-                            Acceso Corporativo
-                        </h1>
-                        <p className="text-gray-500 mt-2 text-sm">
-                            Tu Intranet segura, potenciada por Finansueños.
-                        </p>
+                {/* Capa ligera para mejorar legibilidad */}
+                <div className="absolute inset-0 bg-indigo-950/30 backdrop-blur-[1px]"></div>
+
+                {/* Contenedor del formulario */}
+                <div className="relative z-10 w-full max-w-md p-8 bg-white/20 backdrop-blur-2xl border border-white/30 rounded-3xl shadow-[0_0_40px_rgba(0,0,0,0.3)] text-white transition-transform duration-300 hover:scale-[1.01]">
+                    <div className="flex flex-col items-center mb-8 text-center">
+                        <ArrowLeftStartOnRectangleIcon className="w-12 h-12 text-indigo-200 mb-3" />
+                        <h1 className="text-3xl font-extrabold text-white drop-shadow-md">Bienvenido</h1>
+                        <p className="text-indigo-100 mt-2">Ingresa tus credenciales para continuar</p>
                     </div>
 
+                    {/* Mensajes de error y estado */}
+                    {errors.general && (
+                        <div className="mb-4 font-medium text-sm text-red-200 p-3 bg-red-500/30 rounded-lg backdrop-blur-sm">
+                            {errors.general}
+                        </div>
+                    )}
+                    {status && <div className="mb-4 font-medium text-sm text-green-200">{status}</div>}
+
+                    {/* Formulario */}
                     <form onSubmit={submit}>
-                        
-                        {/* Campo Email */}
+                        {/* Email */}
                         <div className="mb-6">
-                            {/* Input con estilo neumórfico suave */}
-                            <input
-                                id="email"
-                                type="email"
-                                name="email"
-                                value={data.email}
-                                className="w-full p-4 text-gray-700 bg-gray-50 border-none rounded-lg shadow-inner-custom placeholder-gray-400 
-                                           focus:outline-none focus:ring-2 focus:ring-red-600 transition duration-200"
-                                autoComplete="username"
-                                autoFocus={true}
-                                onChange={(e) => setData('email', e.target.value)}
-                                placeholder="Correo Electrónico Corporativo"
-                                required
-                            />
-                            <FormError message={errors.email} />
-                        </div>
-
-                        {/* Campo Contraseña */}
-                        <div className="mb-6">
-                            {/* Input con estilo neumórfico suave */}
-                            <input
-                                id="password"
-                                type="password"
-                                name="password"
-                                value={data.password}
-                                className="w-full p-4 text-gray-700 bg-gray-50 border-none rounded-lg shadow-inner-custom placeholder-gray-400 
-                                           focus:outline-none focus:ring-2 focus:ring-red-600 transition duration-200"
-                                autoComplete="current-password"
-                                onChange={(e) => setData('password', e.target.value)}
-                                placeholder="Contraseña Segura"
-                                required
-                            />
-                            <FormError message={errors.password} />
-                        </div>
-
-                        {/* Opciones Adicionales */}
-                        <div className="flex justify-between items-center mb-8 text-sm">
-                            <label className="flex items-center text-gray-600">
-                                <input
-                                    type="checkbox"
-                                    name="remember"
-                                    checked={data.remember}
-                                    onChange={(e) => setData('remember', e.target.checked)}
-                                    className="rounded-full border-gray-300 text-red-600 shadow-sm focus:ring-red-600 transition duration-150"
-                                />
-                                <span className="ml-2 text-sm">Mantenerme Conectado</span>
+                            <label
+                                className="block text-sm font-medium text-indigo-100 mb-2"
+                                htmlFor="email"
+                            >
+                                Correo Electrónico
                             </label>
-
-                            {canResetPassword && (
-                                <Link
-                                    href={route('password.request')}
-                                    className="text-sm text-red-600 hover:text-red-700 font-semibold transition duration-150"
-                                >
-                                    ¿Olvidaste tu contraseña?
-                                </Link>
-                            )}
+                            <div className="relative">
+                                <AtSymbolIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-indigo-300" />
+                                <input
+                                    id="email"
+                                    type="email"
+                                    name="email"
+                                    value={data.email}
+                                    className={`w-full pl-10 pr-4 py-3 border rounded-xl bg-white/15 text-white placeholder-indigo-200 focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 shadow-sm transition ${
+                                        errors.email ? 'border-red-400' : 'border-white/20'
+                                    }`}
+                                    placeholder="tu@correo.com"
+                                    autoComplete="username"
+                                    onChange={(e) => setData('email', e.target.value)}
+                                    required
+                                />
+                            </div>
+                            {errors.email && <p className="mt-2 text-sm text-red-200">{errors.email}</p>}
                         </div>
 
-                        {/* Botón de Login (Estético de Contraste) */}
+                        {/* Contraseña */}
+                        <div className="mb-8">
+                            <label
+                                className="block text-sm font-medium text-indigo-100 mb-2"
+                                htmlFor="password"
+                            >
+                                Contraseña
+                            </label>
+                            <div className="relative">
+                                <LockClosedIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-indigo-300" />
+                                <input
+                                    id="password"
+                                    type="password"
+                                    name="password"
+                                    value={data.password}
+                                    className={`w-full pl-10 pr-4 py-3 border rounded-xl bg-white/15 text-white placeholder-indigo-200 focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 shadow-sm transition ${
+                                        errors.password ? 'border-red-400' : 'border-white/20'
+                                    }`}
+                                    placeholder="••••••••"
+                                    autoComplete="current-password"
+                                    onChange={(e) => setData('password', e.target.value)}
+                                    required
+                                />
+                            </div>
+                            {errors.password && <p className="mt-2 text-sm text-red-200">{errors.password}</p>}
+                        </div>
+
+                        {/* Botón */}
                         <div>
                             <button
                                 type="submit"
-                                className={`w-full flex items-center justify-center bg-red-600 text-white font-bold rounded-lg py-3 shadow-red-500/50 text-lg
-                                            transition duration-300 transform active:scale-[0.98] 
-                                            ${processing 
-                                                ? 'opacity-75 cursor-wait' 
-                                                : 'hover:bg-red-700 shadow-lg hover:shadow-xl focus:ring-4 focus:ring-red-300'
-                                            }`} 
+                                className="w-full flex items-center justify-center px-6 py-3 border border-transparent text-base font-bold rounded-xl shadow-lg text-white bg-indigo-600 hover:bg-indigo-700 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-400 transition duration-200 disabled:opacity-50"
                                 disabled={processing}
                             >
                                 {processing ? (
                                     <>
-                                        {/* Spinner de carga (simulación Tailwind) */}
-                                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                                        Procesando Acceso...
+                                        <svg
+                                            className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <circle
+                                                className="opacity-25"
+                                                cx="12"
+                                                cy="12"
+                                                r="10"
+                                                stroke="currentColor"
+                                                strokeWidth="4"
+                                            ></circle>
+                                            <path
+                                                className="opacity-75"
+                                                fill="currentColor"
+                                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                            ></path>
+                                        </svg>
+                                        Procesando...
                                     </>
-                                ) : 'Iniciar Sesión'}
+                                ) : (
+                                    'Iniciar Sesión'
+                                )}
                             </button>
                         </div>
                     </form>
-                    
-                    {/* Sección de Soporte */}
-                    <div className="mt-10 pt-6 border-t border-gray-100 text-center text-xs text-gray-400">
-                        Para soporte técnico, llama al 555-FINANSUEÑOS.
+
+                    <div className="mt-8 text-center text-xs text-indigo-200">
+                        Para soporte técnico, llama al{' '}
+                        <span className="font-semibold">555-FINANSUEÑOS</span>.
                     </div>
                 </div>
             </div>
-            
-            {/* Clases CSS personalizadas para el efecto neumórfico sutil */}
-            <style jsx>{`
-                .shadow-inner-custom {
-                    box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.05), 
-                                inset -1px -1px 3px rgba(255, 255, 255, 0.9);
-                }
-            `}</style>
         </GuestLayout>
     );
 }
