@@ -37,18 +37,18 @@ export default function Login({ status }) {
                 password: data.password,
             });
 
-            const token = response.data.access_token || response.data.token;
+            // Usamos el token devuelto por el UserController.php
+            const token = response.data.token || response.data.access_token;
 
             if (token) {
+                // 1. Guardar el token (necesario para futuras llamadas API)
                 localStorage.setItem('auth_token', token);
-                router.visit(route('dashboard'), {
-                    method: 'get',
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                    preserveState: false,
-                    preserveScroll: false,
-                });
+                
+                // 2. *** MODIFICACIÓN CLAVE: Simplificar el router.visit ***
+                // Redirigir a la ruta web del dashboard. Laravel/Inertia se encarga
+                // de cargar el usuario en el HandleInertiaRequests.php
+                router.visit(route('dashboard'));
+                
             } else {
                 setError('general', 'Acceso denegado. Credenciales inválidas o token no recibido.');
                 setData((prev) => ({ ...prev, processing: false }));

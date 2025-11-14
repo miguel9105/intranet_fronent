@@ -1,14 +1,18 @@
 // resources/js/Components/Sidebar.jsx
 
-import { Link, usePage } from '@inertiajs/react'; // <-- ¡usePage es CRÍTICO para leer los props de autenticación!
+import { Link, usePage } from '@inertiajs/react'; 
 import React from 'react';
 import { 
     ArchiveBoxIcon, 
     LifebuoyIcon, 
     DocumentTextIcon, 
     ArrowLeftEndOnRectangleIcon, 
-    HomeIcon 
-} from '@heroicons/react/24/outline'; // Iconos llamativos
+    HomeIcon,
+    UsersIcon,         
+    ClipboardIcon,     
+    BriefcaseIcon,     
+    ChartBarIcon, 
+} from '@heroicons/react/24/outline'; 
 
 // -----------------------------------------------------------
 // Componente de Enlace de Navegación (sin cambios)
@@ -31,22 +35,36 @@ const NavItem = ({ href, active, children, icon: Icon }) => {
     );
 };
 
+// --- FUNCIÓN DE UTILIDAD PARA VERIFICACIÓN DE ROLES ---
+// Verifica si el usuario tiene AL MENOS UNO de los roles requeridos
+const hasAnyRole = (userRoles, rolesRequired) => {
+    if (!userRoles || userRoles.length === 0) return false;
+    // Asegura que rolesRequired sea un array
+    const required = Array.isArray(rolesRequired) ? rolesRequired : [rolesRequired];
+    // Comprueba si algún rol del usuario está en la lista de requeridos
+    return userRoles.some(role => required.includes(role));
+};
+
+
 // -----------------------------------------------------------
 // Componente Principal Sidebar (con la lógica de roles)
 // -----------------------------------------------------------
 export default function Sidebar({ primaryColor = 'bg-indigo-700' }) {
     
     // --- LECTURA CRÍTICA DE ROLES ---
-    // 1. Obtener los props de la página actual, incluyendo 'auth'
     const { auth } = usePage().props;
     
-    // 2. Leer el array de roles. Si no existe o es null, usamos un array vacío.
-    const userRoles = auth.user.role_names || [];
-    
-    // 3. Condición lógica: Determinar si el usuario tiene el rol requerido para ver el enlace
-    const esAdministradorOGestor = userRoles.includes('Administrador') || userRoles.includes('Gestor');
+    // CORRECCIÓN: Leer la propiedad 'roles' (como se comparte desde Laravel)
+    const userRoles = auth.user ? auth.user.roles : []; 
+    console.log(userRoles);
     // ---------------------------------
     
+    // Roles específicos del proyecto
+    const ROL_ADMINISTRADOR = 'Administrador';
+    const ROL_GESTOR = 'gestor';
+    const ROL_ADMINISTRATIVO = 'administrativo';
+    const ROL_ASESOR = 'asesor';
+
     return (
         <div className={`flex flex-col h-full p-4 ${primaryColor}`}>
             {/* Logo o Título */}
@@ -59,13 +77,43 @@ export default function Sidebar({ primaryColor = 'bg-indigo-700' }) {
             {/* Opciones de Navegación */}
             <nav className="flex-1 space-y-2">
                 <NavItem href="dashboard" icon={HomeIcon}>Dashboard</NavItem>
-                <NavItem href="inventario" icon={ArchiveBoxIcon}>Inventario</NavItem>
-                <NavItem href="mesa-de-ayuda" icon={LifebuoyIcon}>Mesa de Ayuda</NavItem>
                 
-                {/* --- APLICAR RESTRICCIÓN DE ROL --- */}
-                {esAdministradorOGestor && (
-                    <NavItem href="documentos" icon={DocumentTextIcon}>Documentos</NavItem>
+                {/* === ADMINISTRACIÓN (ROL: administrador) === */}
+                {hasAnyRole(userRoles, ROL_ADMINISTRADOR) && (
+                    <>
+                        <div className="text-xs font-bold uppercase text-indigo-300 pt-4 pb-1">Administración</div>
+                        <NavItem href="gestion-usuarios" icon={UsersIcon}>Usuarios</NavItem>
+                        <NavItem href="configuracion" icon={ClipboardIcon}>Configuración Sistema</NavItem>
+                    </>
                 )}
+
+                {/* === GESTIÓN (ROLES: administrador, gestor) === */}
+                {hasAnyRole(userRoles, [ROL_ADMINISTRADOR, ROL_GESTOR]) && (
+                    <>
+                        <div className="text-xs font-bold uppercase text-indigo-300 pt-4 pb-1">Gestión Empresarial</div>
+                        <NavItem href="reportes" icon={ChartBarIcon}>Reportes Gerenciales</NavItem>
+                        <NavItem href="proyectos" icon={ArchiveBoxIcon}>Gestión de Proyectos</NavItem>
+                    </>
+                )}
+                
+                {/* === TAREAS OPERATIVAS (ROLES: administrador, gestor, administrativo) === */}
+                {hasAnyRole(userRoles, [ROL_ADMINISTRADOR, ROL_GESTOR, ROL_ADMINISTRATIVO]) && (
+                    <>
+                        <div className="text-xs font-bold uppercase text-indigo-300 pt-4 pb-1">Operaciones</div>
+                        <NavItem href="inventario" icon={ArchiveBoxIcon}>Inventario</NavItem>
+                        <NavItem href="documentos" icon={DocumentTextIcon}>Documentos Legales</NavItem>
+                    </>
+                )}
+                
+                {/* === ASESORÍA (ROLES: administrador, asesor) === */}
+                {hasAnyRole(userRoles, [ROL_ADMINISTRADOR, ROL_ASESOR]) && (
+                    <>
+                        <div className="text-xs font-bold uppercase text-indigo-300 pt-4 pb-1">Comercial</div>
+                        <NavItem href="clientes" icon={BriefcaseIcon}>Clientes y Cartera</NavItem>
+                        <NavItem href="agenda" icon={LifebuoyIcon}>Agenda de Asesor</NavItem>
+                    </>
+                )}
+
             </nav>
 
             {/* Cerrar Sesión (al final) */}

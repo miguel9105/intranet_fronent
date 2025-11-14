@@ -29,11 +29,19 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
-        return [
-            ...parent::share($request),
+        $user = $request->user(); // Obtiene el usuario autenticado
+
+        return array_merge(parent::share($request), [
             'auth' => [
-                'user' => $request->user(),
+                'user' => $user ? [
+                    'id'               => $user->id,
+                    'name_user'        => $user->name_user,
+                    'email'            => $user->email,
+                    // *** CAMBIO CLAVE: Cargar el array de roles ***
+                    'roles'            => $user->role_names, 
+                    // Asegúrate de que el accessor 'role_names' exista y funcione en tu modelo User.php
+                ] : null,
             ],
-        ];
+        ]);
     }
 }
