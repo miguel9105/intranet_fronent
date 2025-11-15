@@ -9,7 +9,7 @@ import {
 } from '@heroicons/react/24/outline';
 
 // --- CONFIGURACIÓN DE API LOCAL ---
-const API_BASE_URL = 'http://api.intranet.test';
+const API_BASE_URL = 'http://localhost:8001';
 const API_LOGIN_URL = `${API_BASE_URL}/api/users/login`;
 
 export default function Login({ status }) {
