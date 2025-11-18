@@ -128,7 +128,7 @@ export default function Home(props) {
             <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
                 <div className="max-w-7xl mx-auto">
                     <h2 className="text-4xl font-bold text-gray-800 text-center mb-14">
-                        <span className="border-b-4 border-yellow-400 pb-1">Tu Carrera Comienza Aquí</span> 🚀
+                        <span className="border-b-4 border-yellow-400 pb-1">Tu Carrera Comienza Aquí</span> 
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {areas.map((area, index) => (
@@ -172,7 +172,7 @@ export default function Home(props) {
                     
                     {/* Título de Empresas */}
                     <h2 className="text-4xl font-bold text-gray-800 text-center mb-14">
-                        <span className="border-b-4 border-yellow-400 pb-1">Nuestra Red de Aliados</span> 🤝
+                        <span className="border-b-4 border-yellow-400 pb-1">Nuestra Red de Aliados</span> 
                     </h2>
                     
                     {/* Contenedor de Empresas: IMPLEMENTACIÓN SIN EMPRESACARD */}

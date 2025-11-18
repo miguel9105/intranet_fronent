@@ -36,21 +36,25 @@ export default function Login({ status }) {
                 email: data.email,
                 password: data.password,
             });
+            console.log(response);
 
             // Usamos el token devuelto por el UserController.php
             const token = response.data.token || response.data.access_token;
+            // Capturamos el objeto de usuario completo
+            const userData = response.data.user; // <-- El objeto 'user' contiene el array 'roles'
 
-            if (token) {
+            if (token && userData) {
                 // 1. Guardar el token (necesario para futuras llamadas API)
                 localStorage.setItem('auth_token', token);
                 
-                // 2. *** MODIFICACIÓN CLAVE: Simplificar el router.visit ***
-                // Redirigir a la ruta web del dashboard. Laravel/Inertia se encarga
-                // de cargar el usuario en el HandleInertiaRequests.php
+                // 2. MODIFICACIÓN CLAVE: Guardar el objeto de usuario con roles en localStorage
+                localStorage.setItem('user_data', JSON.stringify(userData));
+                
+                // 3. Redirigir a la ruta web del dashboard.
                 router.visit(route('dashboard'));
                 
             } else {
-                setError('general', 'Acceso denegado. Credenciales inválidas o token no recibido.');
+                setError('general', 'Acceso denegado. Credenciales inválidas o datos de sesión incompletos.');
                 setData((prev) => ({ ...prev, processing: false }));
             }
         } catch (error) {
@@ -78,7 +82,7 @@ export default function Login({ status }) {
                 {/* Video de fondo con color realzado */}
                 <video
                     className="absolute top-0 left-0 w-full h-full object-cover saturate-125 contrast-110 brightness-105"
-                    src="/videos/intranet-bg.mp4" // 👈 Cambia por tu video en public/videos/
+                    src="/videos/intranet-bg.mp4" // Cambia por tu video en public/videos/
                     autoPlay
                     muted
                     loop

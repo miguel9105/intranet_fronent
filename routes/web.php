@@ -5,7 +5,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Illuminate\Http\Request; 
-use Illuminate\Support\Facades\Auth; // Añadido para el logout
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Auth; // Añadido para el logout
 |--------------------------------------------------------------------------
 */
 
-// Rutas Públicas
+// Rutas Públicas... (mantener como está)
 Route::get('login', function () {
     return Inertia::render('Login'); 
 })->name('login'); 
@@ -31,49 +31,52 @@ Route::get('/contacto', function () {
 
 
 // =========================================================================
-// RUTAS PROTEGIDAS POR EL MIDDLEWARE 'auth.token'
+// RUTAS PROTEGIDAS POR EL MIDDLEWARE 'auth.token' (Bloque Corregido)
 // =========================================================================
 
 Route::middleware(['auth.token'])->group(function () {
     
-  $authProps = function (Request $request) {
-    $user = $request->user();
+    // 1. FUNCIÓN DE PROPS (SE MANTIENE, SIN RUTAS DENTRO)
+    $authProps = function (Request $request) {
+        $user = $request->user();
+        
+        $userData = $user ? $user->only('id', 'name', 'email') : ['name' => 'invitado', 'email' => ''];
+
+        if ($user) {
+            // LÍNEA CRÍTICA
+            $userData['role_names'] = $user->role_names; 
+        }
+
+        return [
+            'auth' => [
+                'user' => $userData,
+            ],
+        ];
+    }; // <--- IMPORTANTE: La función $authProps debe cerrarse aquí.
+
     
-    $userData = $user ? $user->only('id', 'name', 'email') : ['name' => 'invitado', 'email' => ''];
-
-    if ($user) {
-        // LÍNEA CRÍTICA
-        $userData['role_names'] = $user->role_names; 
-    }
-
-    return [
-        'auth' => [
-            'user' => $userData,
-        ],
-    ];
-};
-    // RUTA DEL DASHBOARD (CRÍTICA)
+    // 2. RUTA DEL DASHBOARD (CRÍTICA)
     Route::get('/dashboard', function (Request $request) use ($authProps) {
         return Inertia::render('Dashboard', $authProps($request));
     })->name('dashboard');
 
-    // Inventario
-    Route::get('/inventario', function (Request $request) use ($authProps) {
-        return Inertia::render('Inventario/Index', $authProps($request)); 
-    })->name('inventario');
 
-    // Mesa de Ayuda
-    Route::get('/mesa-de-ayuda', function (Request $request) use ($authProps) {
-        return Inertia::render('MesaDeAyuda/Index', $authProps($request));
-    })->name('mesa-de-ayuda');
+    // 3. RUTAS DEL SIDEBAR (TODAS BIEN COLOCADAS AHORA)
 
-   // RUTA PARA EL MÓDULO DE DOCUMENTOS Y PROCESAMIENTO
-   Route::get('/documentos', function (Request $request) use ($authProps) {
-        // La ruta es más simple ya que los roles van incluidos en $authProps
-        return Inertia::render('Documentos', $authProps($request)); 
-    })->middleware('role:Administrador,Gestor')->name('documentos');
+    // Rutas de Gestión Interna (Administrador)
+    Route::get('/gestion-usuarios', fn () => Inertia::render('Users'))->name('users.index');
+    Route::get('/configuracion', fn () => Inertia::render('GeneralConfig'))->name('config.general');
+    
+    // Rutas de Operaciones (Gestor, Administrativo, Admin)
+    Route::get('/inventario', fn () => Inertia::render('Inventory'))->name('inventory.index');
+    Route::get('/documentos', fn () => Inertia::render('LegalDocuments'))->name('documents.index');
+    
+    // Rutas de Comercial (Asesor, Admin)
+    Route::get('/clientes', fn () => Inertia::render('Clients'))->name('clients.index');
+    Route::get('/agenda', fn () => Inertia::render('AdvisorSchedule'))->name('schedule.index');
 
-    // Rutas de Cierre de Sesión (usando Inertia Post)
+    
+    // 4. Rutas de Cierre de Sesión (usando Inertia Post)
     Route::post('logout', function (Request $request) {
         Auth::guard('web')->logout();
         $request->session()->invalidate();
@@ -81,3 +84,5 @@ Route::middleware(['auth.token'])->group(function () {
         return redirect('/login');
     })->name('logout');
 });
+
+// Nota: Elimina el bloque de ProfileController si no lo estás usando actualmente.

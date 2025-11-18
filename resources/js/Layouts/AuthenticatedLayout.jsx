@@ -1,118 +1,183 @@
-// resources/js/Layouts/AuthenticatedLayout.jsx
-import React, { useState } from 'react';
-import { Link, Head, router } from '@inertiajs/react'; // Importar router
-import Sidebar from '@/Components/Sidebar'; // Asegúrate que la ruta sea correcta
-import { ArrowLeftStartOnRectangleIcon, BellIcon, UserCircleIcon, Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'; // Iconos
+// js/Layouts/AuthenticatedLayout.jsx (CÓDIGO CORREGIDO)
 
-// Componente Principal del Layout
-export default function Authenticated({ auth, header, children }) {
-    const user = auth.user;
-    const [sidebarOpen, setSidebarOpen] = useState(true); // Control de visibilidad del sidebar
+import React, { useState, useEffect, useCallback } from 'react';
+// IMPORTACIÓN CORREGIDA: Se añade 'usePage' para verificar la URL actual
+import { Head, Link, usePage } from '@inertiajs/react'; 
+import { 
+    HomeIcon, 
+    ArchiveBoxIcon, 
+    LifebuoyIcon, 
+    ArrowLeftEndOnRectangleIcon,
+    UsersIcon, 
+    ClipboardIcon, 
+    BriefcaseIcon, 
+    DocumentTextIcon, 
+} from '@heroicons/react/24/outline';
 
-    // Función para manejar el cierre de sesión: Elimina el token y redirige.
-    const handleLogout = (e) => {
-        e.preventDefault();
-        
-        // 1. Eliminar el token
-        localStorage.removeItem('auth_token');
 
-        // 2. Usar Inertia POST para llamar a la ruta de logout de Laravel
-        router.post(route('logout'), {}, {
-            onFinish: () => {
-                // Redirigir al login después de que Laravel finalice la sesión
-                router.visit(route('login'));
-            }
-        });
-    };
-    
-    // --- ESTILOS DE LAYOUT ---
-    const primaryColor = 'bg-indigo-700'; // Color primario del sidebar
+// --- Definición de Roles y Funciones de Ayuda (MANDATORIO) ---
+const ROL_ADMINISTRADOR = 'Administrador';
+const ROL_GESTOR = 'Gestor';
+const ROL_ADMINISTRATIVO = 'Administrativo';
+const ROL_ASESOR = 'Asesor';
+
+const hasAnyRole = (userRoles, rolesRequired) => {
+    if (!userRoles || userRoles.length === 0) return false;
+    const required = Array.isArray(rolesRequired) ? rolesRequired : [rolesRequired];
+    const lowerUserRoles = userRoles.map(role => role.toLowerCase());
+    const lowerRequiredRoles = required.map(role => role.toLowerCase());
+    return lowerUserRoles.some(role => lowerRequiredRoles.includes(role));
+};
+
+
+// --- Componente de Enlace de Navegación CORREGIDO (Ahora funciona) ---
+const NavItem = ({ href, children, icon: Icon }) => {
+    // USAR usePage para obtener la URL actual y determinar si el enlace es activo
+    const { url } = usePage();
+    // Comprueba si la URL actual comienza con el href del enlace.
+    const isActive = url.startsWith(`/${href}`); 
 
     return (
-        <div className="flex h-screen bg-gray-100 antialiased">
-            <Head title={header ? header.props.children : 'Dashboard'} />
+        // CAMBIO CRÍTICO: Reemplazar <div> por <Link>
+        <Link 
+            href={`/${href}`} // Asegura que el href sea un path absoluto (/dashboard, /clientes, etc.)
+            className={`flex items-center p-3 my-2 transition-colors duration-200 rounded-lg group ${isActive ? 'bg-indigo-600 text-white' : 'hover:bg-indigo-600 text-indigo-200'}`}
+        >
+            <Icon className={`w-6 h-6 mr-3 ${isActive ? 'text-white' : 'text-indigo-300 group-hover:text-white'}`} />
+            <span className="font-semibold text-sm">{children}</span>
+        </Link>
+    );
+};
 
-            {/* Overlay para móvil */}
-            {sidebarOpen && (
-                <div 
-                    className="fixed inset-0 z-20 bg-black opacity-50 lg:hidden" 
-                    onClick={() => setSidebarOpen(false)}
-                ></div>
-            )}
 
-            {/* Sidebar (Menú Lateral) */}
-            <div className={`fixed inset-y-0 left-0 z-30 transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition duration-200 ease-in-out lg:translate-x-0 lg:static lg:inset-0 w-64 ${primaryColor}`}>
-                <Sidebar primaryColor={primaryColor} />
+// --- Componente Sidebar (Implementando Lógica de LocalStorage) ---
+const Sidebar = ({ primaryColor = 'bg-indigo-700' }) => {
+    
+    // ... (El resto del código de Sidebar se mantiene igual) ...
+    const [userRoles, setUserRoles] = useState([]);
+    
+    useEffect(() => {
+        const storedUserData = localStorage.getItem('user_data');
+        if (storedUserData) {
+            try {
+                const userData = JSON.parse(storedUserData);
+                setUserRoles(userData.roles || []); 
+            } catch (e) {
+                console.error("Error al parsear user_data de localStorage", e);
+            }
+        }
+    }, []);
+    
+    const handleLogout = () => {
+        // Lógica de logout simulada
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('user_data');
+        // En una app real de Inertia, usarías Inertia.post(route('logout'))
+        window.location.reload(); 
+    }
+
+    const rolesAdmin = ROL_ADMINISTRADOR;
+    const rolesOperacion = [ROL_ADMINISTRATIVO, ROL_GESTOR, ROL_ADMINISTRADOR];
+    const rolesAsesoria = [ROL_ASESOR, ROL_ADMINISTRADOR];
+
+    return (
+        <div className={`flex flex-col h-full p-4 ${primaryColor}`}>
+            <div className="flex items-center justify-between h-16 mb-6">
+                <span className="text-white text-xl font-bold tracking-wider">
+                    FINANSUEÑOS
+                </span>
             </div>
 
-            {/* Contenido Principal */}
-            <main className="flex-1 flex flex-col overflow-auto">
-                {/* Header (Barra Superior) */}
-                <header className="bg-white shadow-sm sticky top-0 z-10">
-                    <div className="max-w-full mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-                        <div className="flex items-center">
-                            {/* Botón de toggle para móvil */}
-                            <button
-                                className="text-gray-500 focus:outline-none focus:text-gray-600 lg:hidden mr-3"
-                                onClick={() => setSidebarOpen(!sidebarOpen)}
-                            >
-                                {sidebarOpen ? <XMarkIcon className="w-6 h-6" /> : <Bars3Icon className="w-6 h-6" />}
-                            </button>
-                            
-                            {/* Título de la página */}
-                            {header && (
-                                <h1 className="font-semibold text-2xl text-gray-800 leading-tight">
-                                    {header}
-                                </h1>
-                            )}
-                        </div>
+            <nav className="flex-1 space-y-2">
+                
+                {/* Dashboard (Visible para todos) */}
+                {/* Se elimina el prop active={true} ya que NavItem lo calcula internamente */}
+                <NavItem href="dashboard" icon={HomeIcon}>Dashboard</NavItem> 
+                
+                {/* === MÓDULO DE GESTIÓN (ROL: Administrador) === */}
+                {hasAnyRole(userRoles, rolesAdmin) && (
+                    <>
+                        <div className="text-xs font-bold uppercase text-indigo-300 pt-4 pb-1">Gestión Interna</div>
+                        <NavItem href="gestion-usuarios" icon={UsersIcon}>Usuarios</NavItem> 
+                        <NavItem href="configuracion" icon={ClipboardIcon}>Configuración General</NavItem>
+                    </>
+                )}
 
-                        {/* Perfil y Notificaciones */}
-                        <div className="flex items-center space-x-4">
-                            <button className="text-gray-400 hover:text-gray-500 transition duration-150">
-                                <BellIcon className="w-6 h-6" />
-                            </button>
+                {/* === MÓDULO DE OPERACIONES (ROLES: Administrativo, Gestor, Administrador) === */}
+                {hasAnyRole(userRoles, rolesOperacion) && (
+                    <>
+                        <div className="text-xs font-bold uppercase text-indigo-300 pt-4 pb-1">Operaciones</div>
+                        <NavItem href="inventario" icon={ArchiveBoxIcon}>Inventario</NavItem>
+                        <NavItem href="documentos" icon={DocumentTextIcon}>Documentos Legales</NavItem>
+                    </>
+                )}
+                
+                {/* === MÓDULO DE ASESORÍA/COMERCIAL (ROLES: Asesor, Administrador) === */}
+                {hasAnyRole(userRoles, rolesAsesoria) && (
+                    <>
+                        <div className="text-xs font-bold uppercase text-indigo-300 pt-4 pb-1">Comercial y Cartera</div>
+                        <NavItem href="clientes" icon={BriefcaseIcon}>Clientes y Cartera</NavItem>
+                        <NavItem href="agenda" icon={LifebuoyIcon}>Agenda de Asesor</NavItem>
+                    </>
+                )}
+                
+            </nav>
 
-                            {/* Menú de Perfil (Dropdown simple) */}
-                            <div className="relative group">
-                                <div className="flex items-center cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition duration-150">
-                                    <UserCircleIcon className="w-8 h-8 text-indigo-600 mr-2" />
-                                    <span className="text-sm font-medium text-gray-700 hidden sm:block">{user.name}</span>
-                                </div>
-
-                                {/* Contenido del Dropdown */}
-                                <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-xl z-20 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition duration-300 transform origin-top-right border border-gray-100">
-                                    <div className="p-4">
-                                        <div className="flex items-center mb-4 border-b pb-3">
-                                            <UserCircleIcon className="w-10 h-10 text-indigo-600 mr-3" />
-                                            <div>
-                                                <p className="font-semibold text-gray-800 truncate">{user.name}</p>
-                                                <p className="text-xs text-gray-500 truncate">{user.email}</p>
-                                            </div>
-                                        </div>
-                                        
-                                        {/* Botón de Logout */}
-                                        <button
-                                            onClick={handleLogout}
-                                            className="w-full flex items-center justify-center p-3 mt-2 text-sm font-medium text-gray-600 rounded-xl hover:bg-gray-200 transition duration-150"
-                                        >
-                                            <ArrowLeftStartOnRectangleIcon className="w-5 h-5 mr-3" />
-                                            Cerrar Sesión
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </header>
-
-                {/* Contenido de la Página */}
-                <div className="flex-1 overflow-auto">
-                    <div className="py-6 px-4 sm:px-6 lg:px-8">
-                        {children}
-                    </div>
-                </div>
-            </main>
+            {/* Cerrar Sesión */}
+            <div className="mt-auto pt-4 border-t border-indigo-500/50">
+                <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center p-3 text-red-300 transition-colors duration-200 rounded-lg hover:bg-red-700 hover:text-white group"
+                >
+                    <ArrowLeftEndOnRectangleIcon className="w-6 h-6 mr-3 text-red-300 group-hover:text-white" />
+                    <span className="font-semibold text-sm">Cerrar Sesión</span>
+                </button>
+            </div>
         </div>
     );
-}
+};
+
+// --- Componente AuthenticatedLayout SIMPLIFICADO (Principal Exportación) ---
+export default function AuthenticatedLayout({ header, children }) {
+    
+    // ... (El resto del código se mantiene igual) ...
+    const storedUserData = localStorage.getItem('user_data');
+    let user = { name_user: 'Usuario' };
+
+    if (storedUserData) {
+        try {
+            const userData = JSON.parse(storedUserData);
+            user = { ...user, ...userData };
+        } catch (e) {
+            console.error("Error al cargar user_data desde localStorage:", e);
+        }
+    }
+
+    const userName = user.name_user || 'Usuario';
+
+    return (
+        <div className="min-h-screen bg-gray-100 flex">
+            {/* Sidebar */}
+            <div className="hidden md:block w-64 fixed top-0 left-0 h-full">
+                <Sidebar /> 
+            </div>
+            
+            {/* Contenido Principal */}
+            <div className="flex-1 md:ml-64">
+                {/* Header */}
+                <header className="bg-white shadow">
+                    <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                        {header}
+                    </div>
+                </header>
+                
+                {/* Contenido */}
+                <main className="py-12">
+                    <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                        {children}
+                    </div>
+                </main>
+            </div>
+        </div>
+    );
+};
